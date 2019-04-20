@@ -96,3 +96,11 @@ When a user clicks the Home button at the bottom of the page, the user is able t
 | **Week 13** | Share photos in community, Thumb up a photo or video in the community... |
 | **Week 14** | Test, Upload to Andriod app store...                         |
 | **Week 15** | Review issues, Fix bugs, Add new features...                 |
+
+## Info
+
+Since we sperate client and server, it will be more convenient for you to check the following link to access our code.
+
+AppClient: https://github.com/sustech-se2019/main-project-repository-pilipili/tree/app_with_test
+
+Server: https://github.com/sustech-se2019/Backend
