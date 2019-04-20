@@ -10,6 +10,16 @@
 * 11611908 龚玥
 * 11612831 关浩
 
+## Info
+
+`Important` 
+
+Since we sperate client and server, it will be more convenient for you to check the following link to access our code.
+
+AppClient: https://github.com/sustech-se2019/AppClient
+
+Server: https://github.com/sustech-se2019/Backend
+
 ## Three Features We have Chosen
 
 ### Login/Signup
@@ -97,10 +107,3 @@ When a user clicks the Home button at the bottom of the page, the user is able t
 | **Week 14** | Test, Upload to Andriod app store...                         |
 | **Week 15** | Review issues, Fix bugs, Add new features...                 |
 
-## Info
-
-Since we sperate client and server, it will be more convenient for you to check the following link to access our code.
-
-AppClient: https://github.com/sustech-se2019/main-project-repository-pilipili/tree/app_with_test
-
-Server: https://github.com/sustech-se2019/Backend
