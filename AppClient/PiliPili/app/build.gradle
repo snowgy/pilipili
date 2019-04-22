@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'com.android.application'
+apply plugin: 'jacoco'
+jacoco {
+    toolVersion = "0.7.1.201405082137"
+}
 android {
     compileSdkVersion 27
     buildToolsVersion '26.0.2'
@@ -16,6 +20,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled = true
         }
     }
 }

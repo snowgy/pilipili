@@ -20,7 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /** Main Activity */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BottomNavigationBar.OnTabSelectedListener {
     @BindView(R.id.gridView)
     GridView gridView;
     String baseURL = "http://10.20.35.198:8080/img/";
@@ -34,6 +34,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        if (!Session.isLogin){
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }
 
         BottomNavigationBar bottomNavigationBar = (BottomNavigationBar) findViewById(R.id.bottom_navigation_bar);
         bottomNavigationBar
@@ -43,8 +47,6 @@ public class MainActivity extends AppCompatActivity {
                 .addItem(new BottomNavigationItem(R.drawable.ic_person_outline_black_24dp, "me"))
                 .setFirstSelectedPosition(0)
                 .initialise();
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
         CustomAdapter adapter = new CustomAdapter(this);
         gridView.setAdapter(adapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -56,49 +58,52 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        bottomNavigationBar.setTabSelectedListener(this);
     }
 
-//    /**
-//     * Specify the behavior when a tab is selected
-//     * @param position the position of the tab
-//     */
-//    @Override
-//    public void onTabSelected(int position) {
-//        switch (position) {
-//            case 0:
-//                //todo implement click behavior of home tab
-//                //break;
-//            case 1:
-//                //todo implement click behavior of camera tab
-//                //break;
-//            case 2:
-//                //todo implement click behavior of love tab
-//                //break;
-//            case 3:
-//                //todo implement click behavior of me tab
-//                //break;
-//            default:
-//
-//        }
-//    }
-//
-//    /**
-//     * Specify the behavior when a tab is unselected
-//     * @param position the position of the tab
-//     */
-//    @Override
-//    public void onTabUnselected(int position) {
-//
-//    }
-//
-//    /**
-//     * Specify the behavior when a tab is reselected
-//     * @param position the position of the tab
-//     */
-//    @Override
-//    public void onTabReselected(int position) {
-//
-//    }
+    /**
+     * Specify the behavior when a tab is selected
+     * @param position the position of the tab
+     */
+    @Override
+    public void onTabSelected(int position) {
+        switch (position) {
+            case 0:
+                //todo implement click behavior of home tab
+                break;
+            case 1:
+                new CameraActivity(this).tryTakePhoto();
+                break;
+            case 2:
+                //todo implement click behavior of love tab
+                break;
+            case 3:
+                //todo implement click behavior of me tab
+                break;
+            default:
+
+        }
+    }
+
+    /**
+     * Specify the behavior when a tab is unselected
+     * @param position the position of the tab
+     */
+    @Override
+    public void onTabUnselected(int position) {
+
+    }
+
+    /**
+     * Specify the behavior when a tab is reselected
+     * @param position the position of the tab
+     */
+    @Override
+    public void onTabReselected(int position) {
+        if (1 == position) {
+            new CameraActivity(this).tryTakePhoto();
+        }
+    }
 
     private class CustomAdapter extends BaseAdapter {
         public Context context;

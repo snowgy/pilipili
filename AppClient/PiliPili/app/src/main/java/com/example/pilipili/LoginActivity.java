@@ -138,6 +138,7 @@ public class LoginActivity extends AppCompatActivity {
      */
     public void onLoginSuccess() {
         loginButton.setEnabled(true);
+        Session.isLogin = true;
         finish();
     }
 
