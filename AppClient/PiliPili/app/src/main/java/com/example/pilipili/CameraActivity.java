@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -33,17 +34,33 @@ import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jp.co.cyberagent.android.gpuimage.GPUImage;
+import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
+import jp.co.cyberagent.android.gpuimage.GPUImageGlassSphereFilter;
+import jp.co.cyberagent.android.gpuimage.GPUImageGrayscaleFilter;
+import jp.co.cyberagent.android.gpuimage.GPUImageSketchFilter;
+import jp.co.cyberagent.android.gpuimage.GPUImageSoftLightBlendFilter;
 
 public class CameraActivity extends AppCompatActivity {
 
     // private final Activity activity;
     private File mImageFile;
     private Uri resultUri;
-    private Intent dataCallback;
+    private Bitmap globalBitmap;
+    private GPUImage gpuImage;
+
     public static final int TAKE_PHOTO_CODE = 1;
     public static final int SELECT_PHOTO_CODE = 2;
+
     @BindView(R.id.editImageView)
     ImageView editImageView;
+
+    @BindView(R.id.filter_grey_btn)
+    Button greyButton;
+    @BindView(R.id.filter_sketch_btn)
+    Button sketchButton;
+    @BindView(R.id.filter_glass_btn)
+    Button glassButton;
 
 //    public CameraActivity(Activity activity) {
 //        this.activity = activity;
@@ -56,7 +73,6 @@ public class CameraActivity extends AppCompatActivity {
         if (getIntent().getIntExtra("choice", 0) == 0)
             tryTakePhoto();
         else{
-            System.out.println("photo select23");
             selectAlbum();
         }
 
@@ -75,17 +91,13 @@ public class CameraActivity extends AppCompatActivity {
 
     private void takePhoto() {
         Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        dataCallback = takePhotoIntent;
         if (takePhotoIntent.resolveActivity(getPackageManager()) != null) {
             mImageFile = createImageFile();
             if (mImageFile == null)
                 return;
-            System.out.println("===========before get uri=====================");
             Uri imageUri = FileProvider.getUriForFile(CameraActivity.this, "com.example.pilipili.fileProvider", mImageFile);
             resultUri = imageUri;
             takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-            // activity.startActivityForResult(takePhotoIntent, 1001);
-            System.out.println("=================finish=====================");
             startActivityForResult(takePhotoIntent, TAKE_PHOTO_CODE);
         }
     }
@@ -98,13 +110,41 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * add filter to the image
+     */
+    public void filterImage() {
+        greyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gpuImage.setImage(globalBitmap);
+                gpuImage.setFilter(new GPUImageGrayscaleFilter());
+                Bitmap fiteredBitmap = gpuImage.getBitmapWithFilterApplied();
+                editImageView.setImageBitmap(fiteredBitmap);
+            }
+        });
+        sketchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gpuImage.setImage(globalBitmap);
+                gpuImage.setFilter(new GPUImageSketchFilter());
+                Bitmap fiteredBitmap = gpuImage.getBitmapWithFilterApplied();
+                editImageView.setImageBitmap(fiteredBitmap);
+            }
+        });
+        glassButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gpuImage.setImage(globalBitmap);
+                gpuImage.setFilter(new GPUImageGlassSphereFilter());
+                Bitmap fiteredBitmap = gpuImage.getBitmapWithFilterApplied();
+                editImageView.setImageBitmap(fiteredBitmap);
+            }
+        });
+    }
+
+
     private File createImageFile() {
-//        mImageFile = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpg");
-//        try {
-//            mImageFile.createNewFile();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File imageFile = null;
@@ -137,6 +177,9 @@ public class CameraActivity extends AppCompatActivity {
                 try {
                     bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), resultUri);
                     editImageView.setImageBitmap(bitmap);
+                    globalBitmap = bitmap;
+                    gpuImage = new GPUImage(CameraActivity.this);
+                    filterImage();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -154,6 +197,9 @@ public class CameraActivity extends AppCompatActivity {
                 try {
                     bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
                     editImageView.setImageBitmap(bitmap);
+                    globalBitmap = bitmap;
+                    gpuImage = new GPUImage(CameraActivity.this);
+                    filterImage();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

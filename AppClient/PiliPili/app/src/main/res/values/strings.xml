@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">PiliPili</string>
+    <string name="black">black</string>
+
 </resources>
