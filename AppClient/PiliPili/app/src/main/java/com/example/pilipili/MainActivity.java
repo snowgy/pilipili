@@ -1,6 +1,9 @@
 package com.example.pilipili;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -72,7 +75,31 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                 //todo implement click behavior of home tab
                 break;
             case 1:
-                new CameraActivity(this).tryTakePhoto();
+                System.out.println("=========enter 1==============");
+//                new CameraActivity(this).tryTakePhoto();
+//                break;
+                final Activity context = this;
+                new AlertDialog.Builder(this)
+                        .setTitle("Choose your photo")
+                        .setItems(new String[]{"Camera", "Album"}, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                System.out.println("========="+i+"==============");
+                                if (i == 0) {
+//                                  new CameraActivity().tryTakePhoto();
+                                    Intent intent = new Intent(context, CameraActivity.class);
+                                    intent.putExtra("choice", 0);
+                                    startActivity(intent);
+                                } else {
+                                    System.out.println("enter 1\n");
+                                    Intent intent = new Intent(context, CameraActivity.class);
+                                    intent.putExtra("choice", 1);
+                                    startActivity(intent);
+                                }
+                            }
+                        })
+                        .create()
+                        .show();
                 break;
             case 2:
                 //todo implement click behavior of love tab
@@ -101,7 +128,27 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
     @Override
     public void onTabReselected(int position) {
         if (1 == position) {
-            new CameraActivity(this).tryTakePhoto();
+//            new CameraActivity(this).tryTakePhoto();
+            final Activity context = this;
+            new AlertDialog.Builder(this)
+                    .setTitle("Choose your photo")
+                    .setItems(new String[]{"Camera", "Album"}, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (i == 0) {
+//                                new CameraActivity().tryTakePhoto();
+                                Intent intent = new Intent(context, CameraActivity.class);
+                                intent.putExtra("choice", 0);
+                                startActivity(intent);
+                            } else {
+                                Intent intent = new Intent(context, CameraActivity.class);
+                                intent.putExtra("choice", 1);
+                                startActivity(intent);
+                            }
+                        }
+                    })
+                    .create()
+                    .show();
         }
     }
 
