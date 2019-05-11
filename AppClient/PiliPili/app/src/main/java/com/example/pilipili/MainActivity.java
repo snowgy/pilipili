@@ -75,9 +75,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                 //todo implement click behavior of home tab
                 break;
             case 1:
-                System.out.println("=========enter 1==============");
-//                new CameraActivity(this).tryTakePhoto();
-//                break;
                 final Activity context = this;
                 new AlertDialog.Builder(this)
                         .setTitle("Choose your photo")
@@ -86,12 +83,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 System.out.println("========="+i+"==============");
                                 if (i == 0) {
-//                                  new CameraActivity().tryTakePhoto();
                                     Intent intent = new Intent(context, CameraActivity.class);
                                     intent.putExtra("choice", 0);
                                     startActivity(intent);
                                 } else {
-                                    System.out.println("enter 1\n");
                                     Intent intent = new Intent(context, CameraActivity.class);
                                     intent.putExtra("choice", 1);
                                     startActivity(intent);

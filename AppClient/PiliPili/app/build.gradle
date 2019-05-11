@@ -6,7 +6,7 @@ jacoco {
 }
 android {
     compileSdkVersion 27
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId "com.example.pilipili"
@@ -50,5 +50,6 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
     implementation 'com.squareup.okhttp3:okhttp:3.5.0'
     compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
+    implementation 'org.tensorflow:tensorflow-android:1.2.0-preview'
 }
 

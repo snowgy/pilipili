@@ -1,23 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CameraActivity">
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:gravity="center">-->
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
-
+        android:layout_centerHorizontal="true"
+        android:id="@+id/imageparent">
         <ImageView
             android:id="@+id/editImageView"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            android:layout_marginTop="50dp"
-            android:layout_marginBottom="50dp" />
-    </LinearLayout>
+            android:layout_width="260dp"
+            android:layout_height="260dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            />
+    </RelativeLayout>
+
+    <!--</LinearLayout>-->
 
 
     <LinearLayout
@@ -27,6 +34,7 @@
         android:layout_margin="10dp"
         android:orientation="horizontal"
         android:gravity="center"
+        android:layout_below="@id/imageparent"
         >
         <Button
             android:id="@+id/filter_grey_btn"
@@ -55,39 +63,24 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/style_tansfer_bar"
+    <GridView
+        android:id="@+id/grid_layout"
+        android:numColumns="6"
+        android:layout_below="@+id/filter_bar"
+        android:stretchMode="columnWidth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        >
-        <Button
-            android:id="@+id/style_btn_1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:layout_weight="1"
-            android:text="Starry"
-            android:textSize="16sp" />
-        <Button
-            android:id="@+id/style_btn_2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:layout_weight="1"
-            android:text="Happy"
-            android:textSize="16sp" />
-        <Button
-            android:id="@+id/style_btn_3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:layout_weight="1"
-            android:text="xxx"
-            android:textSize="16sp" />
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:horizontalSpacing="2dp"
+        android:verticalSpacing="2dp"/>
 
-    </LinearLayout>
+    <com.ashokvarma.bottomnavigation.BottomNavigationBar
+        android:layout_gravity="bottom"
+        android:id="@+id/edit_nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"/>
 
-</LinearLayout>
+</RelativeLayout>
