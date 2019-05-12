@@ -47,6 +47,7 @@ import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -74,7 +75,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     private int desiredHeight = 0;
 
     private GPUImage gpuImage;
-    private int frameNum = 0;
+    private int flag = 0;
     private boolean DEBUG = true;
 
     private boolean allZero = false;
@@ -148,7 +149,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                             break;
 
                         default: // fall out
-
                     }
                     return true;
                 }
@@ -163,14 +163,13 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     Button sketchButton;
     @BindView(R.id.filter_glass_btn)
     Button glassButton;
+    @BindView(R.id.remove_backgroud_btn)
+    Button removeButton;
 
     private boolean isDebug() {
         return DEBUG;
     }
 
-    //    public CameraActivity(Activity activity) {
-//        this.activity = activity;
-//    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -310,6 +309,16 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
             }
         });
         glassButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gpuImage.setImage(globalBitmap);
+                gpuImage.setFilter(new GPUImageGlassSphereFilter());
+                Bitmap fiteredBitmap = gpuImage.getBitmapWithFilterApplied();
+                currentBitmap = fiteredBitmap;
+                editImageView.setImageBitmap(fiteredBitmap);
+            }
+        });
+        removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 gpuImage.setImage(globalBitmap);
@@ -586,10 +595,15 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
             case 1:
                 editImageView.setImageBitmap(globalBitmap);
             case 2:
-                //todo implement click behavior of love tab
+                boolean success = saveImageToGallery(CameraActivity.this, currentBitmap);
+                if (success) {
+                    Toast.makeText(getBaseContext(), "successfully save to your album", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getBaseContext(), "fail to save your photo", Toast.LENGTH_LONG).show();
+                }
                 break;
             case 3:
-                //todo implement click behavior of me tab
+                //todo implement click behavior of upload tab
                 break;
             default:
 
@@ -621,14 +635,38 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
             case 1:
                 editImageView.setImageBitmap(globalBitmap);
             case 2:
-                //todo implement click behavior of love tab
+                //todo implement click behavior of save tab
                 break;
             case 3:
-                //todo implement click behavior of me tab
+                //todo implement click behavior of upload tab
                 break;
             default:
 
         }
+    }
+
+    public boolean saveImageToGallery(Context context, Bitmap bitmap) {
+        boolean success = false;
+        flag++;
+        // save image first
+        try {
+            FileOutputStream fos = new FileOutputStream(mImageFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            MediaStore.Images.Media.insertImage(context.getContentResolver(),
+                    mImageFile.getAbsolutePath(), mImageFile.getName()+String.valueOf(flag), null);
+            success = true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        // remind the system album
+        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + Environment.getExternalStorageDirectory())));
+        return success;
     }
 
 }

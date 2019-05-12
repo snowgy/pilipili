@@ -63,10 +63,30 @@
 
     </LinearLayout>
 
+
+    <LinearLayout
+        android:id="@+id/remove_backgroud_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_below="@id/filter_bar"
+        >
+        <Button
+            android:id="@+id/remove_backgroud_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:text="Remove Backgroud"
+            android:textSize="16sp" />
+    </LinearLayout>
+
     <GridView
         android:id="@+id/grid_layout"
         android:numColumns="6"
-        android:layout_below="@+id/filter_bar"
+        android:layout_below="@+id/remove_backgroud_bar"
         android:stretchMode="columnWidth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

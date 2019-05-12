@@ -51,5 +51,6 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.5.0'
     compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
     implementation 'org.tensorflow:tensorflow-android:1.2.0-preview'
+    // implementation 'com.github.gabrielbb:cutout:0.1.2'
 }
 

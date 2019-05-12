@@ -7,9 +7,11 @@ import com.example.pilipili.model.User;
 import com.example.pilipili.service.auth.LoginService;
 import com.example.pilipili.service.auth.SignupService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 
 /** UserController Provides User APIs. */
 @RestController
@@ -67,11 +69,6 @@ public final class UserController {
      */
     @PostMapping(value = {"/userSignup"})
     public ResponseEntity signup(@RequestBody User user) {
-//        User user = new User();
-//        user.setUserName(userName);
-//        user.setPassword(password);
-
-
         if(signupService.signupUser(user)) {
             ResponseUser responseUser = new ResponseUser();
             responseUser.setUserName(user.getUserName());
@@ -81,6 +78,31 @@ public final class UserController {
             return new ResponseEntity(ResponseCode.FAIL, signupService.getMessage());
         }
 
+    }
+
+    @PostMapping(value = {"/uploadImg"})
+    public @ResponseBody String uploadImg(@RequestParam("file") MultipartFile file,
+                                          HttpServletRequest request) {
+        String contentType = file.getContentType();
+        String fileName = file.getOriginalFilename();
+        String filePath = getImgPath();
+        try {
+            FileUtils.uploadFile(file.getBytes(), filePath, fileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return filePath;
+    }
+
+    public static String getImgPath() {
+        String filePath = UserController.class.getClassLoader().getResource("").toString();
+        File file=new File(filePath);
+        filePath =file.getParent();
+        int s = filePath.indexOf("/");
+        int e = filePath.lastIndexOf("/");
+        filePath = filePath.substring(s, e+1);
+        filePath += "/src/main/resources/static/img/";
+        return filePath;
     }
 
 }
