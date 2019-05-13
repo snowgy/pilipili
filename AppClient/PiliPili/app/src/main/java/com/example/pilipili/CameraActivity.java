@@ -1,10 +1,7 @@
 package com.example.pilipili;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -15,13 +12,9 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.media.Image;
-import android.media.ImageReader;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.SystemClock;
-import android.os.Trace;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -33,17 +26,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
-import com.bumptech.glide.Glide;
 import com.example.pilipili.service.UploadService;
-import com.example.pilipili.utils.BitmapUtils;
 
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
@@ -59,11 +48,9 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jp.co.cyberagent.android.gpuimage.GPUImage;
-import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageGlassSphereFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageGrayscaleFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageSketchFilter;
-import jp.co.cyberagent.android.gpuimage.GPUImageSoftLightBlendFilter;
 
 public class CameraActivity extends AppCompatActivity implements BottomNavigationBar.OnTabSelectedListener {
 
@@ -78,7 +65,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
 
     private GPUImage gpuImage;
     private int flag = 0;
-    private boolean DEBUG = true;
 
     private boolean allZero = false;
     private static final boolean NORMALIZE_SLIDERS = true;
@@ -169,7 +155,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     Button removeButton;
 
     private boolean isDebug() {
-        return DEBUG;
+        return false;
     }
 
     @Override
@@ -278,6 +264,10 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         }
     }
 
+    /**
+     * Try to take a photo
+     * if the permission failed, request camera and write permission
+     */
     public void tryTakePhoto() {
         if (cameraPermission()) {
             takePhoto();
@@ -343,12 +333,14 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         Matrix matrix = new Matrix();
         matrix.postScale(scaleWidth, scaleHeight);
         Bitmap newBM = Bitmap.createBitmap(origin, 0, 0, width, height, matrix, false);
-//        if (!origin.isRecycled()) {
-//            origin.recycle();
-//        }
         return newBM;
     }
 
+    /**
+     * Style the image
+     * @param originBitmap original bitmap
+     * @return
+     */
     private Bitmap stylizeImage(Bitmap originBitmap) {
         // Bitmap bitmap = scaleBitmap(originBitmap, 256, 256); // desiredSize
         Bitmap bitmap = scaleBitmap(originBitmap, desiredWidth, desiredHeight); // desiredSize
@@ -454,6 +446,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     private void setArgs(Bitmap bitmap) {
         editImageView.setImageBitmap(bitmap);
         globalBitmap = bitmap;
+        currentBitmap = globalBitmap;
         desiredWidth = 240;
         desiredHeight = 320;
         gpuImage = new GPUImage(CameraActivity.this);
@@ -596,6 +589,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 break;
             case 1:
                 editImageView.setImageBitmap(globalBitmap);
+                break;
             case 2:
                 boolean success = saveImageToGallery(CameraActivity.this, currentBitmap);
                 if (success) {
@@ -648,6 +642,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 break;
             case 1:
                 editImageView.setImageBitmap(globalBitmap);
+                break;
             case 2:
                 try {
                     File tmp = createImageFile();
@@ -671,6 +666,12 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         }
     }
 
+    /**
+     * save the current image to gallery
+     * @param context activity context
+     * @param bitmap current bitmap
+     * @return
+     */
     public boolean saveImageToGallery(Context context, Bitmap bitmap) {
         boolean success = false;
         flag++;
