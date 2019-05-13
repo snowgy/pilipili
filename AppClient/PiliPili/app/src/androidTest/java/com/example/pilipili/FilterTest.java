@@ -5,6 +5,7 @@ import android.support.test.espresso.DataInteraction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,13 +34,19 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class AlbumTest {
+public class FilterTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
+    @Rule
+    public GrantPermissionRule mGrantPermissionRule =
+            GrantPermissionRule.grant(
+                    "android.permission.CAMERA",
+                    "android.permission.WRITE_EXTERNAL_STORAGE");
+
     @Test
-    public void albumTest() {
+    public void filterTest() {
         ViewInteraction appCompatEditText = onView(
                 allOf(withId(R.id.user_name),
                         childAtPosition(
@@ -91,8 +98,41 @@ public class AlbumTest {
                         childAtPosition(
                                 withClassName(is("android.widget.FrameLayout")),
                                 0)))
-                .atPosition(1);
+                .atPosition(0);
         appCompatTextView.perform(click());
+
+        ViewInteraction appCompatButton2 = onView(
+                allOf(withId(R.id.filter_grey_btn), withText("Grey"),
+                        childAtPosition(
+                                allOf(withId(R.id.filter_bar),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.RelativeLayout")),
+                                                1)),
+                                0),
+                        isDisplayed()));
+        appCompatButton2.perform(click());
+
+        ViewInteraction appCompatButton3 = onView(
+                allOf(withId(R.id.filter_sketch_btn), withText("Sketch"),
+                        childAtPosition(
+                                allOf(withId(R.id.filter_bar),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.RelativeLayout")),
+                                                1)),
+                                1),
+                        isDisplayed()));
+        appCompatButton3.perform(click());
+
+        ViewInteraction appCompatButton4 = onView(
+                allOf(withId(R.id.filter_glass_btn), withText("Glass"),
+                        childAtPosition(
+                                allOf(withId(R.id.filter_bar),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.RelativeLayout")),
+                                                1)),
+                                2),
+                        isDisplayed()));
+        appCompatButton4.perform(click());
     }
 
     private static Matcher<View> childAtPosition(

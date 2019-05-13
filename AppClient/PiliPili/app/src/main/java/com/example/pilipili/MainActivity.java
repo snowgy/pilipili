@@ -1,11 +1,15 @@
 package com.example.pilipili;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +33,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
     GridView gridView;
     String baseURL = "http://10.20.35.198:8080/img/";
     String suffix = ".jpeg";
-    String[] catComments = {"Cute!", "Lovely", "Aw!", "Mew~", "Little", "QWQ", "Aww", "In love", "God", "Cool"};
-    String[] catImages = {baseURL+"cat1"+suffix, baseURL+"cat2"+suffix, baseURL+"cat3"+suffix, baseURL+"cat4"+suffix, baseURL+"cat5"+suffix, baseURL+"cat6"+suffix, baseURL+"cat7"+suffix, baseURL+"cat8"+suffix, baseURL+"cat9"+suffix, baseURL+"cat10"+suffix};
+    String[] catComments = {"Cute!", "Lovely", "Aw!", "Mew~", "Little", "QWQ", "Aww", "In love"};
+    String[] catImages = {baseURL+"cat1"+suffix, baseURL+"cat2"+suffix, baseURL+"cat3"+suffix, baseURL+"cat4"+suffix, baseURL+"cat5"+suffix, baseURL+"cat6"+suffix, baseURL+"cat7"+suffix, baseURL+"cat8"+suffix};
+    public static final int TAKE_PHOTO_CODE = 1;
+    public static final int SELECT_PHOTO_CODE = 2;
     //String[] catComments = {"Cute!", "Lovely"};
     // String[] catImages = {baseURL+"cat1"+suffix, baseURL+"cat2"+suffix};
     @Override
@@ -77,6 +83,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                 break;
             case 1:
                 final Activity context = this;
+                if (! cameraPermission()) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, SELECT_PHOTO_CODE);
+                }
                 new AlertDialog.Builder(this)
                         .setTitle("Choose your photo")
                         .setItems(new String[]{"Camera", "Album"}, new DialogInterface.OnClickListener() {
@@ -132,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             if (i == 0) {
-//                                new CameraActivity().tryTakePhoto();
                                 Intent intent = new Intent(context, CameraActivity.class);
                                 intent.putExtra("choice", 0);
                                 startActivity(intent);
@@ -140,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                                 Intent intent = new Intent(context, CameraActivity.class);
                                 intent.putExtra("choice", 1);
                                 startActivity(intent);
+
                             }
                         }
                     })
@@ -178,30 +187,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
             Glide.with(context)
                     .load(catImages[i])
                     .into(image);
-            //image.setImageResource(catImages[i]);
             return view1;
         }
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
+    private boolean cameraPermission() {
+        return ContextCompat.checkSelfPermission((Context) MainActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission((Context) MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean albumPermission() {
+        return ContextCompat.checkSelfPermission((Context) MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+
 }

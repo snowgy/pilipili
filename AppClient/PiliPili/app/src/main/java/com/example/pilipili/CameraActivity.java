@@ -29,13 +29,10 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.example.pilipili.service.UploadService;
-
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -179,8 +176,10 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         grid.setOnTouchListener(gridTouchAdapter);
         setStyle(imageGridAdapter.items[0], 1.0f);
         if (getIntent().getIntExtra("choice", 0) == 0)
-            tryTakePhoto();
+            // tryTakePhoto();
+            takePhoto();
         else {
+            // trySelectAlbum();
             selectAlbum();
         }
 
@@ -240,6 +239,14 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         }
     }
 
+    private void trySelectAlbum() {
+        if (albumPermission()) {
+            selectAlbum();
+        } else {
+            ActivityCompat.requestPermissions(CameraActivity.this, new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE}, SELECT_PHOTO_CODE);
+        }
+    }
+
     private void selectAlbum() {
         Intent albumIntent = new Intent(Intent.ACTION_PICK);
         albumIntent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -249,6 +256,10 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     private boolean cameraPermission() {
         return ContextCompat.checkSelfPermission((Context) CameraActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission((Context) CameraActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean albumPermission() {
+        return ContextCompat.checkSelfPermission((Context) CameraActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void takePhoto() {
@@ -273,6 +284,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
             takePhoto();
         } else {
             ActivityCompat.requestPermissions(CameraActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, TAKE_PHOTO_CODE);
+            // takePhoto();
         }
     }
 
@@ -440,7 +452,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 }
             }
         }
-
     }
 
     private void setArgs(Bitmap bitmap) {
@@ -572,7 +583,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     private static void rgbTransformation(Bitmap bitmap) {
 
     }
-
 
     /**
      * Specify the behavior when a tab is selected

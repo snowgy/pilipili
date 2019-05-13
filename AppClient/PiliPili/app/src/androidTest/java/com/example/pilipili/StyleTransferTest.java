@@ -5,6 +5,7 @@ import android.support.test.espresso.DataInteraction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,13 +34,19 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class AlbumTest {
+public class StyleTransferTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
+    @Rule
+    public GrantPermissionRule mGrantPermissionRule =
+            GrantPermissionRule.grant(
+                    "android.permission.CAMERA",
+                    "android.permission.WRITE_EXTERNAL_STORAGE");
+
     @Test
-    public void albumTest() {
+    public void styleTransferTest() {
         ViewInteraction appCompatEditText = onView(
                 allOf(withId(R.id.user_name),
                         childAtPosition(
