@@ -42,6 +42,8 @@ import android.widget.Toast;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.bumptech.glide.Glide;
+import com.example.pilipili.service.UploadService;
+import com.example.pilipili.utils.BitmapUtils;
 
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
@@ -603,7 +605,19 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 }
                 break;
             case 3:
-                //todo implement click behavior of upload tab
+                try {
+                    File tmp = createImageFile();
+                    FileOutputStream fos = new FileOutputStream(tmp);
+                    currentBitmap.compress(Bitmap.CompressFormat.JPEG, 50, fos);
+                    UploadService.upload(tmp);
+                    fos.flush();
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                // BitmapUtils.compressImageToFile(currentBitmap, mImageFile);
+                // UploadService.upload(mImageFile);
+
                 break;
             default:
 
@@ -635,7 +649,19 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
             case 1:
                 editImageView.setImageBitmap(globalBitmap);
             case 2:
-                //todo implement click behavior of save tab
+                try {
+                    File tmp = createImageFile();
+                    FileOutputStream fos = new FileOutputStream(tmp);
+                    currentBitmap.compress(Bitmap.CompressFormat.JPEG, 50, fos);
+                    UploadService.upload(tmp);
+                    fos.flush();
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                // BitmapUtils.compressImageToFile(currentBitmap, mImageFile);
+                // UploadService.upload(mImageFile);
+
                 break;
             case 3:
                 //todo implement click behavior of upload tab

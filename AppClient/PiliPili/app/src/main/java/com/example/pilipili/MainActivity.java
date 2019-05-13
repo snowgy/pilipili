@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.bumptech.glide.Glide;
+import com.example.pilipili.utils.Session;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
