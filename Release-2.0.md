@@ -17,7 +17,7 @@ Six.
 
 #### How many commits your group have made in total since the deadline for progress report (on Week 9)?
 
-13  commits in total
+14  commits in total
 
 #### Do the number of features match with your schedule in the progress report? If not, explain the reason. 
 

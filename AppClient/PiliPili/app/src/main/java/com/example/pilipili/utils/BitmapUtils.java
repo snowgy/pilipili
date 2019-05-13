@@ -15,10 +15,8 @@ public class BitmapUtils {
      * @param file output file
      */
     public static void compressImageToFile(Bitmap bmp, File file) {
-        // 0-100 100为不压缩
         int options = 50;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        // 把压缩后的数据存放到baos中
         bmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
         try {
             FileOutputStream fos = new FileOutputStream(file);
