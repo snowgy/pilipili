@@ -1,6 +1,5 @@
 package com.example.pilipili;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,8 +16,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
@@ -31,7 +28,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
-import com.example.pilipili.service.GeneralService;
 import com.example.pilipili.service.UploadService;
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 import java.io.File;
@@ -52,7 +48,6 @@ import jp.co.cyberagent.android.gpuimage.GPUImageSketchFilter;
 
 public class CameraActivity extends AppCompatActivity implements BottomNavigationBar.OnTabSelectedListener {
 
-    // private final Activity activity;
     private File mImageFile;
     private Uri resultUri;
     private Bitmap globalBitmap;
@@ -90,6 +85,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
 
     public static final int TAKE_PHOTO_CODE = 1;
     public static final int SELECT_PHOTO_CODE = 2;
+    public static final int CROP_PHOTO = 3;
 
     private final View.OnTouchListener gridTouchAdapter =
             new View.OnTouchListener() {
@@ -108,7 +104,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                                     slider.setHilighted(true);
                                 }
                             }
-                            // stylizeImage(globalBitmap);
                             break;
 
                         case MotionEvent.ACTION_MOVE:
@@ -132,7 +127,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                             if (slider != null) {
                                 slider.setHilighted(false);
                                 slider = null;
-                                // stylizeImage(globalBitmap);
                             }
                             break;
 
@@ -179,10 +173,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         grid.setOnTouchListener(gridTouchAdapter);
         setStyle(imageGridAdapter.items[0], 1.0f);
         if (getIntent().getIntExtra("choice", 0) == 0)
-            // tryTakePhoto();
             takePhoto();
         else {
-            // trySelectAlbum();
             selectAlbum();
         }
 
@@ -242,27 +234,10 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         }
     }
 
-    private void trySelectAlbum() {
-        if (albumPermission()) {
-            selectAlbum();
-        } else {
-            ActivityCompat.requestPermissions(CameraActivity.this, new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE}, SELECT_PHOTO_CODE);
-        }
-    }
-
     private void selectAlbum() {
         Intent albumIntent = new Intent(Intent.ACTION_PICK);
         albumIntent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(albumIntent, SELECT_PHOTO_CODE);
-    }
-
-    private boolean cameraPermission() {
-        return ContextCompat.checkSelfPermission((Context) CameraActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission((Context) CameraActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private boolean albumPermission() {
-        return ContextCompat.checkSelfPermission((Context) CameraActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void takePhoto() {
@@ -278,18 +253,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         }
     }
 
-    /**
-     * Try to take a photo
-     * if the permission failed, request camera and write permission
-     */
-    public void tryTakePhoto() {
-        if (cameraPermission()) {
-            takePhoto();
-        } else {
-            ActivityCompat.requestPermissions(CameraActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, TAKE_PHOTO_CODE);
-            // takePhoto();
-        }
-    }
 
     /**
      * add filter to the image
@@ -407,6 +370,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         return imageFile;
     }
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (1000 == requestCode) {
@@ -417,46 +381,105 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         }
     }
 
+    public void cropPhoto(Uri imageUri) {
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setDataAndType(imageUri, "image/*");
+        intent.putExtra("crop", "true");
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        intent.putExtra("outputX", 260);
+        intent.putExtra("outputY", 260);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        startActivityForResult(intent, CROP_PHOTO);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (RESULT_OK != resultCode) {
             return;
         }
-        if (requestCode == TAKE_PHOTO_CODE) {
-            if (resultUri != null) {
-                Bitmap bitmap;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), resultUri);
-                    setArgs(bitmap);
-                    // croppedBitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
-                    filterImage();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        switch (requestCode) {
+            case TAKE_PHOTO_CODE:
+                if (resultUri != null) {
+                    // cropPhoto(resultUri);
+                    Bitmap bitmap;
+                    try{
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), resultUri);
+                        setArgs(bitmap);
+                        filterImage();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
-            }
-        } else if (requestCode == SELECT_PHOTO_CODE) {
-            File imageFile = createImageFile();
-            if (imageFile == null)
-                return;
-            Uri imageUri = data.getData();
-            if (imageUri != null) {
-                Bitmap bitmap;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                    setArgs(bitmap);
-                    // croppedBitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
-                    filterImage();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-            }
+                break;
+            case SELECT_PHOTO_CODE:
+                File imageFile = createImageFile();
+                if (imageFile == null)
+                    return;
+                Uri imageUri = data.getData();
+                if (imageUri != null) {
+                    Bitmap bitmap;
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                        setArgs(bitmap);
+                        filterImage();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case CROP_PHOTO:
+                Uri uri = data.getData();
+                if (uri != null) {
+                    Bitmap bitmap;
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                        setArgs(bitmap);
+                        filterImage();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
         }
+//        if (requestCode == TAKE_PHOTO_CODE) {
+//            if (resultUri != null) {
+//                Bitmap bitmap;
+//                try {
+//                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), resultUri);
+//                    setArgs(bitmap);
+//                    filterImage();
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//        } else if (requestCode == SELECT_PHOTO_CODE) {
+//            File imageFile = createImageFile();
+//            if (imageFile == null)
+//                return;
+//            Uri imageUri = data.getData();
+//            if (imageUri != null) {
+//                Bitmap bitmap;
+//                try {
+//                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+//                    setArgs(bitmap);
+//                    filterImage();
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
     }
 
     private void setArgs(Bitmap bitmap) {
@@ -585,10 +608,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         return bitmap;
     }
 
-    private static void rgbTransformation(Bitmap bitmap) {
-
-    }
-
     /**
      * Specify the behavior when a tab is selected
      * @param position the position of the tab
@@ -622,15 +641,12 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                     if (!isCompressed)
                         currentBitmap.compress(Bitmap.CompressFormat.JPEG, 60, fos);
                     UploadService uploadService = new UploadService();
-                    uploadService.upload(tmp);
+                    uploadService.upload(this, tmp);
                     fos.flush();
                     fos.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                // BitmapUtils.compressImageToFile(currentBitmap, mImageFile);
-                // UploadService.upload(mImageFile);
-
                 break;
             default:
 
@@ -665,24 +681,27 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 editImageView.setImageBitmap(globalBitmap);
                 break;
             case 2:
+                boolean success = saveImageToGallery(CameraActivity.this, currentBitmap);
+                if (success) {
+                    Toast.makeText(getBaseContext(), "successfully save to your album", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getBaseContext(), "fail to save your photo", Toast.LENGTH_LONG).show();
+                }
+                break;
+
+            case 3:
                 try {
                     File tmp = createImageFile();
                     FileOutputStream fos = new FileOutputStream(tmp);
                     if (!isCompressed)
                         currentBitmap.compress(Bitmap.CompressFormat.JPEG, 50, fos);
                     UploadService uploadService = new UploadService();
-                    uploadService.upload(tmp);
+                    uploadService.upload(this, tmp);
                     fos.flush();
                     fos.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                // BitmapUtils.compressImageToFile(currentBitmap, mImageFile);
-                // UploadService.upload(mImageFile);
-
-                break;
-            case 3:
-                //todo implement click behavior of upload tab
                 break;
             default:
 
@@ -718,5 +737,4 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + Environment.getExternalStorageDirectory())));
         return success;
     }
-
 }

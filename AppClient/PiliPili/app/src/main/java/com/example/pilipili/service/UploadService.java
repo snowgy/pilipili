@@ -1,5 +1,8 @@
 package com.example.pilipili.service;
 
+import android.app.Activity;
+import android.widget.Toast;
+
 import com.example.pilipili.utils.Session;
 
 import java.io.File;
@@ -21,14 +24,10 @@ import retrofit2.Retrofit;
 public class UploadService extends GeneralService {
     /**
      * Upload the file to server
+     * @param activity the activity that calls upload
      * @param file file to upload
      */
-    public void upload(File file) {
-        // String baseURL = "http://10.20.35.198:8080";
-//        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-//        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-//        Service service = new Retrofit.Builder().baseUrl(baseURL).client(client).build().create(Service.class);
+    public void upload(final Activity activity, File file) {
         RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), reqFile);
         RequestBody userName = RequestBody.create(MediaType.parse("multipart/form-data"), Session.userName);
@@ -37,6 +36,10 @@ public class UploadService extends GeneralService {
         req.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.body() != null) {
+                    Toast.makeText(activity.getBaseContext(), "upload success", Toast.LENGTH_LONG).show();
+                }
+
             }
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
