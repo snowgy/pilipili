@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
+import com.example.pilipili.service.GeneralService;
 import com.example.pilipili.service.UploadService;
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 import java.io.File;
@@ -74,6 +75,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     private float[] floatValues;
 
     private TensorFlowInferenceInterface inferenceInterface;
+
+    private boolean isCompressed = false;
 
     private static final String MODEL_FILE = "file:///android_asset/stylize_quantized.pb";
 
@@ -292,6 +295,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
      * add filter to the image
      */
     public void filterImage() {
+        isCompressed = false;
         greyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -354,6 +358,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
      * @return
      */
     private Bitmap stylizeImage(Bitmap originBitmap) {
+        isCompressed = true;
         // Bitmap bitmap = scaleBitmap(originBitmap, 256, 256); // desiredSize
         Bitmap bitmap = scaleBitmap(originBitmap, desiredWidth, desiredHeight); // desiredSize
         bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
@@ -598,6 +603,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
             case 1:
+                isCompressed = false;
+                currentBitmap = globalBitmap;
                 editImageView.setImageBitmap(globalBitmap);
                 break;
             case 2:
@@ -612,8 +619,10 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 try {
                     File tmp = createImageFile();
                     FileOutputStream fos = new FileOutputStream(tmp);
-                    currentBitmap.compress(Bitmap.CompressFormat.JPEG, 50, fos);
-                    UploadService.upload(tmp);
+                    if (!isCompressed)
+                        currentBitmap.compress(Bitmap.CompressFormat.JPEG, 60, fos);
+                    UploadService uploadService = new UploadService();
+                    uploadService.upload(tmp);
                     fos.flush();
                     fos.close();
                 } catch (IOException e) {
@@ -651,14 +660,18 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
             case 1:
+                isCompressed = false;
+                currentBitmap = globalBitmap;
                 editImageView.setImageBitmap(globalBitmap);
                 break;
             case 2:
                 try {
                     File tmp = createImageFile();
                     FileOutputStream fos = new FileOutputStream(tmp);
-                    currentBitmap.compress(Bitmap.CompressFormat.JPEG, 50, fos);
-                    UploadService.upload(tmp);
+                    if (!isCompressed)
+                        currentBitmap.compress(Bitmap.CompressFormat.JPEG, 50, fos);
+                    UploadService uploadService = new UploadService();
+                    uploadService.upload(tmp);
                     fos.flush();
                     fos.close();
                 } catch (IOException e) {

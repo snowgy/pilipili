@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,10 +23,20 @@ import android.widget.TextView;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.bumptech.glide.Glide;
+import com.example.pilipili.model.Image;
+import com.example.pilipili.service.GeneralService;
+import com.example.pilipili.service.ImageService;
+import com.example.pilipili.service.Service;
 import com.example.pilipili.utils.Session;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /** Main Activity */
 public class MainActivity extends AppCompatActivity implements BottomNavigationBar.OnTabSelectedListener {
@@ -33,10 +44,17 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
     GridView gridView;
     String baseURL = "http://10.20.35.198:8080/img/";
     String suffix = ".jpeg";
-    String[] catComments = {"Cute!", "Lovely", "Aw!", "Mew~", "Little", "QWQ", "Aww", "In love"};
-    String[] catImages = {baseURL+"cat1"+suffix, baseURL+"cat2"+suffix, baseURL+"cat3"+suffix, baseURL+"cat4"+suffix, baseURL+"cat5"+suffix, baseURL+"cat6"+suffix, baseURL+"cat7"+suffix, baseURL+"cat8"+suffix};
+    // CustomAdapter adapter;
+    // String[] catComments = {"Cute!", "Lovely", "Aw!", "Mew~", "Little", "QWQ", "Aww", "In love"};
+    // String[] catImages = {baseURL+"cat1"+suffix, baseURL+"cat2"+suffix, baseURL+"cat3"+suffix, baseURL+"cat4"+suffix, baseURL+"cat5"+suffix, baseURL+"cat6"+suffix, baseURL+"cat7"+suffix, baseURL+"cat8"+suffix};
+
     public static final int TAKE_PHOTO_CODE = 1;
     public static final int SELECT_PHOTO_CODE = 2;
+
+    private List<String> images = new ArrayList<>();
+    private List<Integer> likes = new ArrayList<>();
+
+    String imgBaseURL = "http://10.20.48.113:8080/api/file/";
     //String[] catComments = {"Cute!", "Lovely"};
     // String[] catImages = {baseURL+"cat1"+suffix, baseURL+"cat2"+suffix};
     @Override
@@ -57,17 +75,58 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                 .addItem(new BottomNavigationItem(R.drawable.ic_person_outline_black_24dp, "me"))
                 .setFirstSelectedPosition(0)
                 .initialise();
-        CustomAdapter adapter = new CustomAdapter(this);
-        gridView.setAdapter(adapter);
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(getApplicationContext(), GridItemActivity.class);
-                intent.putExtra("name", catComments[i]);
-                intent.putExtra("image", catImages[i]);
-                startActivity(intent);
-            }
-        });
+        ImageService imageService = new ImageService();
+        imageService.getAllImages(this, gridView);
+//        GeneralService generalService = new GeneralService();
+//        Service service = generalService.getService();
+//        Call<List<String>> req = service.getAllImages();
+//        adapter = new CustomAdapter(this);
+//        req.enqueue(new Callback<List<String>>() {
+//            @Override
+//            public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+//                /**
+//                 * set image view on the main page
+//                 */
+//                if (response.body() != null){
+//                    System.out.println("---------- not null------------");
+//                    for(String img : response.body()) {
+//                        images.add(imgBaseURL + img);
+//                        System.out.println(imgBaseURL+img);
+//
+//                    }
+//                    gridView.setAdapter(adapter);
+//
+//                    System.out.println("set successful");
+//
+//                    gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                        @Override
+//                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                            Intent intent = new Intent(getApplicationContext(), GridItemActivity.class);
+//                            intent.putExtra("like", likes.get(i));
+//                            intent.putExtra("image", images.get(i));
+//                            startActivity(intent);
+//                        }
+//                    });
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<String>> call, Throwable t) {
+//
+//            }
+//        });
+//        CustomAdapter adapter = new CustomAdapter(this);
+//        gridView.setAdapter(adapter);
+//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                Intent intent = new Intent(getApplicationContext(), GridItemActivity.class);
+//                intent.putExtra("name", catComments[i]);
+//                intent.putExtra("image", catImages[i]);
+//                startActivity(intent);
+//            }
+//        });
         bottomNavigationBar.setTabSelectedListener(this);
     }
 
@@ -79,7 +138,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
     public void onTabSelected(int position) {
         switch (position) {
             case 0:
-                //todo implement click behavior of home tab
+                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(intent);
                 break;
             case 1:
                 final Activity context = this;
@@ -132,64 +192,67 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
      */
     @Override
     public void onTabReselected(int position) {
-        if (1 == position) {
-//            new CameraActivity(this).tryTakePhoto();
-            final Activity context = this;
-            new AlertDialog.Builder(this)
-                    .setTitle("Choose your photo")
-                    .setItems(new String[]{"Camera", "Album"}, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            if (i == 0) {
-                                Intent intent = new Intent(context, CameraActivity.class);
-                                intent.putExtra("choice", 0);
-                                startActivity(intent);
-                            } else {
-                                Intent intent = new Intent(context, CameraActivity.class);
-                                intent.putExtra("choice", 1);
-                                startActivity(intent);
+        switch (position){
+            case 0:
+                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(intent);
+                break;
+            case 1:
+                final Activity context = this;
+                new AlertDialog.Builder(this)
+                        .setTitle("Choose your photo")
+                        .setItems(new String[]{"Camera", "Album"}, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if (i == 0) {
+                                    Intent intent = new Intent(context, CameraActivity.class);
+                                    intent.putExtra("choice", 0);
+                                    startActivity(intent);
+                                } else {
+                                    Intent intent = new Intent(context, CameraActivity.class);
+                                    intent.putExtra("choice", 1);
+                                    startActivity(intent);
 
+                                }
                             }
-                        }
-                    })
-                    .create()
-                    .show();
+                        })
+                        .create()
+                        .show();
         }
+
     }
 
-    private class CustomAdapter extends BaseAdapter {
-        public Context context;
-
-        public CustomAdapter(Context context){
-            this.context = context;
-        }
-        @Override
-        public int getCount() {
-            return catImages.length;
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            View view1 = getLayoutInflater().inflate(R.layout.row_data, null);
-            TextView name = view1.findViewById(R.id.texts);
-            ImageView image = view1.findViewById(R.id.images);
-            name.setText(catComments[i]);
-            Glide.with(context)
-                    .load(catImages[i])
-                    .into(image);
-            return view1;
-        }
-    }
+//    private class CustomAdapter extends BaseAdapter {
+//        public Context context;
+//
+//        public CustomAdapter(Context context){
+//            this.context = context;
+//        }
+//        @Override
+//        public int getCount() {
+//            return images.size();
+//        }
+//
+//        @Override
+//        public Object getItem(int i) {
+//            return null;
+//        }
+//
+//        @Override
+//        public long getItemId(int i) {
+//            return 0;
+//        }
+//
+//        @Override
+//        public View getView(int i, View view, ViewGroup viewGroup) {
+//            View view1 = getLayoutInflater().inflate(R.layout.row_data, null);
+//            ImageView image = view1.findViewById(R.id.images);
+//            Glide.with(context)
+//                    .load(images.get(i))
+//                    .into(image);
+//            return view1;
+//        }
+//    }
 
 
     private boolean cameraPermission() {

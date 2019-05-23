@@ -23,7 +23,8 @@ public class GridItemActivity extends AppCompatActivity {
         image = findViewById(R.id.imageView);
         BottomNavigationBar bottomNavigationBar = (BottomNavigationBar) findViewById(R.id.bottom_grid_item_bar);
         bottomNavigationBar
-                .addItem(new BottomNavigationItem(R.mipmap.ic_outline_arrow_forward_black_24dp, "home"))
+                .addItem(new BottomNavigationItem(R.mipmap.ic_outline_arrow_back_black_24dp, "home"))
+                .addItem(new BottomNavigationItem(R.mipmap.ic_baseline_thumb_up_black_24dp, "like"))
                 .setFirstSelectedPosition(0)
                 .initialise();
         bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener(){

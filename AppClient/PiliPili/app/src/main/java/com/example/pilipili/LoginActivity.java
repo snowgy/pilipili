@@ -26,6 +26,9 @@ import butterknife.ButterKnife;
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
+    private static String baseURL = "http://10.20.48.113:8080";
+    private String globalUserName = "";
+
     @BindView(R.id.user_name)
     EditText userName;
     @BindView(R.id.input_password)
@@ -84,8 +87,9 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.setMessage("Authenticating...");
         progressDialog.show();
 
-        String url = "http://10.20.35.198:8080/userLogin";
+        String url = baseURL + "/userLogin";
         String userNameValue = userName.getText().toString();
+        globalUserName = userNameValue;
         String passwordValue = password.getText().toString();
         HashMap<String, String> parameters = new HashMap<>();
         parameters.put("userName", userNameValue);
@@ -142,6 +146,7 @@ public class LoginActivity extends AppCompatActivity {
     public void onLoginSuccess() {
         loginButton.setEnabled(true);
         Session.isLogin = true;
+        Session.userName = globalUserName;
         finish();
     }
 

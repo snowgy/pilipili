@@ -30,6 +30,9 @@ public class Image {
     @Column(name="image_path")
     private String imagePath;
 
+    @Column(name="like_num")
+    private int likeNum;
+
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", nullable = false)

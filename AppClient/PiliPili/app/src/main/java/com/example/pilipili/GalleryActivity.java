@@ -122,9 +122,7 @@ public class GalleryActivity extends AppCompatActivity {
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             View view1 = getLayoutInflater().inflate(R.layout.row_data, null);
-            TextView name = view1.findViewById(R.id.texts);
             ImageView image = view1.findViewById(R.id.images);
-            name.setText(catComments[i]);
             Glide.with(context)
                     .load(catImages[i])
                     .into(image);

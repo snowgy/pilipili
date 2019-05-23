@@ -24,26 +24,26 @@
 //    public void addInterceptors(InterceptorRegistry registry){
 //        InterceptorRegistration addInterceptor = registry.addInterceptor(getSecurityInterceptor());
 //
-//        addInterceptor.excludePathPatterns("/error");
-//        addInterceptor.excludePathPatterns("/login");
-//        addInterceptor.excludePathPatterns("/userLogin");
-//        //addInterceptor.excludePathPatterns("/userHome");
-//        addInterceptor.excludePathPatterns("/signup");
-//        addInterceptor.excludePathPatterns("/userSignup");
-//        // api test
-//        addInterceptor.excludePathPatterns("/generateData");
-//        addInterceptor.excludePathPatterns("/findusers");
-//        addInterceptor.excludePathPatterns("/topPopular");
-//        addInterceptor.excludePathPatterns("/topLatest");
-//        addInterceptor.excludePathPatterns("/upload");
-//        addInterceptor.excludePathPatterns("/uploadscript");
-//        addInterceptor.excludePathPatterns("/run");
-//        addInterceptor.excludePathPatterns("/getScript");
-//        addInterceptor.excludePathPatterns("/vagueSearch");
-//        addInterceptor.excludePathPatterns("/getContent");
-//        // Welcome page
-//        addInterceptor.excludePathPatterns("/");
-//        addInterceptor.excludePathPatterns("/welcome");
+////        addInterceptor.excludePathPatterns("/error");
+////        addInterceptor.excludePathPatterns("/login");
+////        addInterceptor.excludePathPatterns("/userLogin");
+////        //addInterceptor.excludePathPatterns("/userHome");
+////        addInterceptor.excludePathPatterns("/signup");
+////        addInterceptor.excludePathPatterns("/userSignup");
+////        // api test
+////        addInterceptor.excludePathPatterns("/generateData");
+////        addInterceptor.excludePathPatterns("/findusers");
+////        addInterceptor.excludePathPatterns("/topPopular");
+////        addInterceptor.excludePathPatterns("/topLatest");
+////        addInterceptor.excludePathPatterns("/upload");
+////        addInterceptor.excludePathPatterns("/uploadscript");
+////        addInterceptor.excludePathPatterns("/run");
+////        addInterceptor.excludePathPatterns("/getScript");
+////        addInterceptor.excludePathPatterns("/vagueSearch");
+////        addInterceptor.excludePathPatterns("/getContent");
+////        // Welcome page
+////        addInterceptor.excludePathPatterns("/");
+////        addInterceptor.excludePathPatterns("/welcome");
 //
 //        // Static files
 //        addInterceptor.excludePathPatterns("/css/**");
@@ -60,18 +60,14 @@
 //        public boolean preHandle(HttpServletRequest request,
 //                                 HttpServletResponse response,
 //                                 Object handler) throws IOException {
-//            HttpSession httpSession = request.getSession();
-//            //return true;
-//
-//            if(httpSession.getAttribute(SESSION_KEY) != null){
-//                return true;
-//            }
-//            System.out.println("session not found, redirect to log in");
-//            String url = "/login";
-//            response.sendRedirect(url);
-//            return false;
-//
-//
+////            HttpSession httpSession = request.getSession();
+////            //return true;
+////
+////            if(httpSession.getAttribute(SESSION_KEY) != null){
+////                return true;
+////            }
+////            System.out.println("session not found, redirect to log in");
+//            return true;
 //        }
 //    }
 //

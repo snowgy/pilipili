@@ -24,6 +24,8 @@ import butterknife.ButterKnife;
 /** Signup Activity */
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
+    private static String baseURL = "http://10.20.48.113:8080";
+
     @BindView(R.id.user_name)
     EditText userName;
     @BindView(R.id.input_password)
@@ -78,7 +80,7 @@ public class SignupActivity extends AppCompatActivity {
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Creating Account...");
         progressDialog.show();
-        String url = "http://10.20.35.198:8080/userSignup";
+        String url = baseURL + "/userSignup";
         String userNameValue = userName.getText().toString();
         String passwordValue = password.getText().toString();
         HashMap<String, String> parameters = new HashMap<>();
