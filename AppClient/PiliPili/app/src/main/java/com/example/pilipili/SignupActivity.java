@@ -25,8 +25,8 @@ import butterknife.ButterKnife;
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
 
-    public static String baseURL = "http://10.20.48.113:8080";
-    // private static String baseURL = "http://10.20.35.198:8080";
+    // public static String baseURL = "http://10.20.48.113:8080";
+    private static String baseURL = "http://10.20.35.198:8080";
 
     @BindView(R.id.user_name)
     EditText userName;
