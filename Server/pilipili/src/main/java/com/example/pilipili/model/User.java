@@ -5,17 +5,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.OneToMany;
-import javax.persistence.CascadeType;
+import javax.persistence.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -40,11 +35,35 @@ public class User {
 
     @JsonBackReference
     @OneToMany(
-            mappedBy = "user",
+            mappedBy = "owner",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     private List<Image> imageList = new ArrayList<>();
+
+    @JsonBackReference
+    @ManyToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE,
+            CascadeType.ALL
+    })
+    @JoinTable(name="image_user",
+            joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="image_id")
+    )
+    private Set<Image> lovedImages = new HashSet<>();
+
+    public void addLoveImage(Image img){
+        lovedImages.add(img);
+        img.getLovers().add(this);
+    }
+
+    public void removeLoveImage(Image img){
+        lovedImages.remove(img);
+        img.getLovers().remove(this);
+    }
+
+
 
 
 }

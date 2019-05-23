@@ -37,4 +37,9 @@ public class ImageServiceImpl implements ImageService {
     public void save(Image image) {
         imageRepository.save(image);
     }
+
+    @Override
+    public void lovePhoto(long imgId) {
+
+    }
 }

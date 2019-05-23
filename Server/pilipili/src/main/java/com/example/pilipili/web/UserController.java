@@ -15,7 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /** UserController Provides User APIs. */
 @RestController
@@ -90,19 +92,6 @@ public final class UserController {
 
     }
 
-    @PostMapping(value = {"/uploadImg2"})
-    public @ResponseBody String uploadImg(@RequestParam("file") MultipartFile file,
-                                          HttpServletRequest request) {
-        String fileName = file.getOriginalFilename();
-        String filePath = getImgPath();
-        try {
-            FileUtils.uploadFile(file.getBytes(), filePath, fileName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return filePath;
-    }
-
     @PostMapping(value = {"/uploadImg"})
     public @ResponseBody String uploadImg(@RequestParam("file") MultipartFile file,
                                           @RequestParam("username") String userName,
@@ -123,21 +112,31 @@ public final class UserController {
     public List<ImageData> getUserImages(@RequestParam String userName) {
         User user = userService.getUserByName(userName);
         List<Image> images = user.getImageList();
+        List<ImageData> imageDataList = fillImageList(images);
+        return imageDataList;
+    }
+
+    @PostMapping(value = {"/getLovedImages"})
+    public List<ImageData> getLovedImages(@RequestParam String userName) {
+        User user = userService.getUserByName(userName);
+        Set<Image> lovedImages = user.getLovedImages();
+        List<ImageData> imageDataList = fillImageList(lovedImages);
+        return imageDataList;
+    }
+
+    public List<ImageData> fillImageList(Collection<Image> imgs){
         List<ImageData> imageDataList = new ArrayList<>();
-        for (Image image : images) {
+        for (Image image : imgs) {
             String path = image.getImagePath();
             path = path.substring(path.lastIndexOf("/")+1);
-            System.out.println(path);
             ImageData imageData = new ImageData(image.getImageId(),
                     path,
                     image.getLikeNum(),
-                    image.getUser().getUserName());
+                    image.getOwner().getUserName());
             imageDataList.add(imageData);
         }
         return imageDataList;
     }
-
-
     public static String getImgPath() {
         String filePath = UserController.class.getClassLoader().getResource("").toString();
         File file=new File(filePath);

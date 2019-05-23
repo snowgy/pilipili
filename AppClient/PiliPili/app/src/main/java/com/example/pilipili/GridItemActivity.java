@@ -10,6 +10,7 @@ import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.bumptech.glide.Glide;
 import com.example.pilipili.service.ImageService;
+import com.example.pilipili.utils.Session;
 
 /** Grid Item Activity */
 public class GridItemActivity extends AppCompatActivity {
@@ -54,7 +55,7 @@ public class GridItemActivity extends AppCompatActivity {
                     case 1:
                         like.setText(String.valueOf(++likeNum));
                         ImageService imageService = new ImageService();
-                        imageService.updateLikeNum(imgId, likeNum);
+                        imageService.updateLikeNum(Session.userName, imgId, likeNum);
                         break;
                 }
 
@@ -75,7 +76,7 @@ public class GridItemActivity extends AppCompatActivity {
                     case 1:
                         like.setText(String.valueOf(++likeNum));
                         ImageService imageService = new ImageService();
-                        imageService.updateLikeNum(imgId, likeNum);
+                        imageService.updateLikeNum(Session.userName, imgId, likeNum);
                         break;
                 }
 

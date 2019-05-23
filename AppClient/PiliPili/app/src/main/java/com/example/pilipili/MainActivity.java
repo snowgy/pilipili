@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                         .show();
                 break;
             case 2:
-                imageService.getUserImages(MainActivity.this, gridView);
+                imageService.getLovedImages(MainActivity.this, gridView);
                 break;
             case 3:
                 imageService.getUserImages(MainActivity.this, gridView);
@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                         .show();
                 break;
             case 2:
-                imageService.getUserImages(MainActivity.this, gridView);
+                imageService.getLovedImages(MainActivity.this, gridView);
                 break;
             case 3:
                 imageService.getUserImages(MainActivity.this, gridView);

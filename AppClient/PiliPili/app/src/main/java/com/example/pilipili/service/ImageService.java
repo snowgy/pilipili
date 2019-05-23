@@ -78,7 +78,7 @@ public class ImageService extends GeneralService{
                             Image image = allImages.get(i);
                             intent.putExtra("imageId", image.getId());
                             intent.putExtra("likeNum", image.getLikeNum());
-                            intent.putExtra("image", image.getPath());
+                            intent.putExtra("image", imgBaseURL + image.getPath());
                             mainContext.startActivity(intent);
                         }
                     });
@@ -93,8 +93,9 @@ public class ImageService extends GeneralService{
         });
     }
 
-    public void updateLikeNum(long imgId, int likeNum){
+    public void updateLikeNum(String userName, long imgId, int likeNum){
         Map<String, Object> params = new LinkedHashMap<>();
+        params.put("userName", userName);
         params.put("id", imgId);
         params.put("likes", likeNum);
         Gson gson = new Gson();
@@ -136,7 +137,45 @@ public class ImageService extends GeneralService{
                             Image image = userImages.get(i);
                             intent.putExtra("imageId", image.getId());
                             intent.putExtra("likeNum", image.getLikeNum());
-                            intent.putExtra("image", image.getPath());
+                            intent.putExtra("image", imgBaseURL + image.getPath());
+                            mainContext.startActivity(intent);
+                        }
+                    });
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Image>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public void getLovedImages(Activity activity, GridView gridView){
+        Call<List<Image>> req = service.getLovedImages(Session.userName);
+        final Context mainContext = activity.getBaseContext();
+        adapter = new CustomAdapter(activity, favoImages);
+        myGridView = gridView;
+
+        req.enqueue(new Callback<List<Image>>() {
+            @Override
+            public void onResponse(Call<List<Image>> call, Response<List<Image>> response) {
+                if (response.body() != null){
+                    for(Image img : response.body()) {
+                        favoImages.add(img);
+                    }
+
+                    myGridView.setAdapter(adapter);
+
+                    myGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            Intent intent = new Intent(mainContext, GridItemActivity.class);
+                            Image image = favoImages.get(i);
+                            intent.putExtra("imageId", image.getId());
+                            intent.putExtra("likeNum", image.getLikeNum());
+                            intent.putExtra("image", imgBaseURL + image.getPath());
                             mainContext.startActivity(intent);
                         }
                     });

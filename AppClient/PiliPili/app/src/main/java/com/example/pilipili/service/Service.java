@@ -31,6 +31,10 @@ public interface Service {
     @POST("/getUserImages")
     Call<List<Image>> getUserImages(@Field("userName") String userName);
 
+    @FormUrlEncoded
+    @POST("/getLovedImages")
+    Call<List<Image>> getLovedImages(@Field("userName") String userName);
+
     @POST("/updateLikeNum")
     Call<ResponseBody> updateLikeNum(@Body RequestBody body);
 

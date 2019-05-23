@@ -5,6 +5,7 @@ import com.example.pilipili.model.ImageData;
 import com.example.pilipili.model.LikeForm;
 import com.example.pilipili.model.User;
 import com.example.pilipili.service.ImageService;
+import com.example.pilipili.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,17 +17,9 @@ public class ImageController {
     @Autowired
     ImageService imageService;
 
-//    @PostMapping(value = {"/getAllImages"})
-//    public List<String> getAllImages() {
-//        List<Image> imagesList = imageService.findAllImages();
-//        List<String> pathList = new ArrayList<>();
-//        for (Image image: imagesList) {
-//            String path = image.getImagePath();
-//            System.out.println(path);
-//            pathList.add(path.substring(path.lastIndexOf("/")+1));
-//        }
-//        return pathList;
-//    }
+    @Autowired
+    UserService userService;
+
 
     @PostMapping(value = {"/getAllImages"})
     public List<ImageData> getAllImages() {
@@ -38,7 +31,7 @@ public class ImageController {
             ImageData imageData = new ImageData(image.getImageId(),
                                                 path.substring(path.lastIndexOf("/")+1),
                                                 image.getLikeNum(),
-                                                image.getUser().getUserName());
+                                                image.getOwner().getUserName());
             imageDataList.add(imageData);
         }
         return imageDataList;
@@ -51,8 +44,11 @@ public class ImageController {
 
     @PostMapping(value = {"/updateLikeNum"})
     public void updateLikeNum(@RequestBody LikeForm likeForm) {
+        User user = userService.getUserByName(likeForm.getUserName());
         Image image = imageService.getImageById(likeForm.getId());
         image.setLikeNum(image.getLikeNum() + 1);
+        userService.addLovePhoto(user, image);
+        userService.save(user);
         imageService.save(image);
     }
 }

@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
         User user = getUserByName(userName);
         Image image = new Image();
         image.setImagePath(path);
-        image.setUser(user);
+        image.setOwner(user);
         image.setLikeNum(0);
         imageRepository.save(image);
     }
@@ -57,6 +57,16 @@ public class UserServiceImpl implements UserService {
             paths.add(image.getImagePath());
         }
         return paths;
+    }
+
+    @Override
+    public void addLovePhoto(User user, Image image) {
+        user.addLoveImage(image);
+    }
+
+    @Override
+    public void save(User user) {
+        userRepository.save(user);
     }
 
 //    @Override
