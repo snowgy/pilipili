@@ -6,8 +6,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GeneralService {
-    public static String baseURL = "http://10.20.48.113:8080";
-    // public static String baseURL = "http://10.20.35.198:8080";
+    // public static String baseURL = "http://10.20.48.113:8080";
+    public static String baseURL = "http://10.20.35.198:8080";
     public static HttpLoggingInterceptor interceptor;
     public static OkHttpClient client;
     public static Service service;
