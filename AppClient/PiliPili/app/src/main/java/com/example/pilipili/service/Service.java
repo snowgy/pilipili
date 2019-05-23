@@ -9,10 +9,12 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
-import retrofit2.http.Path;
 
 /**
  * Served as retrofit interface
@@ -25,6 +27,11 @@ public interface Service {
     @POST("/getAllImages")
     Call<List<Image>> getAllImages();
 
+    @FormUrlEncoded
+    @POST("/getUserImages")
+    Call<List<Image>> getUserImages(@Field("userName") String userName);
+
     @POST("/updateLikeNum")
     Call<ResponseBody> updateLikeNum(@Body RequestBody body);
+
 }

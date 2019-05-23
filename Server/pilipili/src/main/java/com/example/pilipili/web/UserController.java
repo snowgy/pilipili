@@ -120,13 +120,16 @@ public final class UserController {
 
 
     @PostMapping(value = {"/getUserImages"})
-    public List<ImageData> getUserImages(String userName) {
+    public List<ImageData> getUserImages(@RequestParam String userName) {
         User user = userService.getUserByName(userName);
         List<Image> images = user.getImageList();
         List<ImageData> imageDataList = new ArrayList<>();
         for (Image image : images) {
+            String path = image.getImagePath();
+            path = path.substring(path.lastIndexOf("/")+1);
+            System.out.println(path);
             ImageData imageData = new ImageData(image.getImageId(),
-                    image.getImagePath(),
+                    path,
                     image.getLikeNum(),
                     image.getUser().getUserName());
             imageDataList.add(imageData);

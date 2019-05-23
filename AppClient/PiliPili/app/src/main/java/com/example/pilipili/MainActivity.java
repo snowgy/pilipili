@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
     GridView gridView;
 
     public static final int SELECT_PHOTO_CODE = 2;
-
+    public ImageService imageService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                 .addItem(new BottomNavigationItem(R.drawable.ic_person_outline_black_24dp, "me"))
                 .setFirstSelectedPosition(0)
                 .initialise();
-        ImageService imageService = new ImageService();
+        imageService = new ImageService();
         imageService.getAllImages(this, gridView);
         bottomNavigationBar.setTabSelectedListener(this);
     }
@@ -86,10 +86,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                         .show();
                 break;
             case 2:
-                //todo implement click behavior of love tab
+                imageService.getUserImages(MainActivity.this, gridView);
                 break;
             case 3:
-                //todo implement click behavior of me tab
+                imageService.getUserImages(MainActivity.this, gridView);
                 break;
             default:
 
@@ -137,6 +137,13 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                         })
                         .create()
                         .show();
+                break;
+            case 2:
+                imageService.getUserImages(MainActivity.this, gridView);
+                break;
+            case 3:
+                imageService.getUserImages(MainActivity.this, gridView);
+                break;
         }
 
     }

@@ -33,9 +33,12 @@ import retrofit2.Response;
 
 public class ImageService extends GeneralService{
 
-    private List<Long> imageIds = new ArrayList<>();
-    private List<String> images = new ArrayList<>();
-    private List<Integer> likes = new ArrayList<>();
+//    private List<Long> imageIds = new ArrayList<>();
+//    private List<String> images = new ArrayList<>();
+//    private List<Integer> likes = new ArrayList<>();
+    private List<Image> allImages = new ArrayList<>();
+    private List<Image> userImages = new ArrayList<>();
+    private List<Image> favoImages = new ArrayList<>();
 
     String imgBaseURL = "http://10.20.48.113:8080/api/file/";
     CustomAdapter adapter;
@@ -52,7 +55,7 @@ public class ImageService extends GeneralService{
     public void getAllImages(final Activity activity, GridView gridView) {
         Call<List<Image>> req = service.getAllImages();
         final Context mainContext = activity.getBaseContext();
-        adapter = new CustomAdapter(activity);
+        adapter = new CustomAdapter(activity, allImages);
         myGridView = gridView;
         req.enqueue(new Callback<List<Image>>() {
             @Override
@@ -63,9 +66,7 @@ public class ImageService extends GeneralService{
 
                 if (response.body() != null){
                     for(Image img : response.body()) {
-                        imageIds.add(img.getId());
-                        images.add(imgBaseURL + img.getPath());
-                        likes.add(img.getLikeNum());
+                        allImages.add(img);
                     }
 
                     myGridView.setAdapter(adapter);
@@ -74,9 +75,10 @@ public class ImageService extends GeneralService{
                         @Override
                         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                             Intent intent = new Intent(mainContext, GridItemActivity.class);
-                            intent.putExtra("imageId", imageIds.get(i));
-                            intent.putExtra("likeNum", likes.get(i));
-                            intent.putExtra("image", images.get(i));
+                            Image image = allImages.get(i);
+                            intent.putExtra("imageId", image.getId());
+                            intent.putExtra("likeNum", image.getLikeNum());
+                            intent.putExtra("image", image.getPath());
                             mainContext.startActivity(intent);
                         }
                     });
@@ -111,21 +113,61 @@ public class ImageService extends GeneralService{
 
     }
 
+    public void getUserImages(Activity activity, GridView gridView){
+        Call<List<Image>> req = service.getUserImages(Session.userName);
+        final Context mainContext = activity.getBaseContext();
+        adapter = new CustomAdapter(activity, userImages);
+        myGridView = gridView;
+
+        req.enqueue(new Callback<List<Image>>() {
+            @Override
+            public void onResponse(Call<List<Image>> call, Response<List<Image>> response) {
+                if (response.body() != null){
+                    for(Image img : response.body()) {
+                        userImages.add(img);
+                    }
+
+                    myGridView.setAdapter(adapter);
+
+                    myGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            Intent intent = new Intent(mainContext, GridItemActivity.class);
+                            Image image = userImages.get(i);
+                            intent.putExtra("imageId", image.getId());
+                            intent.putExtra("likeNum", image.getLikeNum());
+                            intent.putExtra("image", image.getPath());
+                            mainContext.startActivity(intent);
+                        }
+                    });
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Image>> call, Throwable t) {
+
+            }
+        });
+    }
+
 
     private class CustomAdapter extends BaseAdapter {
         public Context context;
+        public List<Image> ownImages;
 
-        public CustomAdapter(Context context){
+        public CustomAdapter(Context context, List<Image> images){
             this.context = context;
+            this.ownImages = images;
         }
         @Override
         public int getCount() {
-            return images.size();
+            return ownImages.size();
         }
 
         @Override
         public Object getItem(int i) {
-            return images.get(i);
+            return ownImages.get(i);
         }
 
         @Override
@@ -138,8 +180,9 @@ public class ImageService extends GeneralService{
             LayoutInflater inflater = LayoutInflater.from(context);
             View view1 = inflater.inflate(R.layout.row_data, null);
             ImageView image = view1.findViewById(R.id.images);
+            String path = ownImages.get(i).getPath();
             Glide.with(context)
-                    .load(images.get(i))
+                    .load(imgBaseURL + path)
                     .into(image);
             return view1;
         }
