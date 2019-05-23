@@ -10,19 +10,30 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.pilipili.GridItemActivity;
 import com.example.pilipili.R;
+import com.example.pilipili.model.Image;
+import com.example.pilipili.utils.Session;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ImageService extends GeneralService{
 
+    private List<Long> imageIds = new ArrayList<>();
     private List<String> images = new ArrayList<>();
     private List<Integer> likes = new ArrayList<>();
 
@@ -39,20 +50,23 @@ public class ImageService extends GeneralService{
      * @param gridView
      */
     public void getAllImages(final Activity activity, GridView gridView) {
-        Call<List<String>> req = service.getAllImages();
+        Call<List<Image>> req = service.getAllImages();
         final Context mainContext = activity.getBaseContext();
         adapter = new CustomAdapter(activity);
         myGridView = gridView;
-        req.enqueue(new Callback<List<String>>() {
+        req.enqueue(new Callback<List<Image>>() {
             @Override
-            public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+            public void onResponse(Call<List<Image>> call, Response<List<Image>> response) {
                 /**
                  * set image view on the main page
                  */
 
                 if (response.body() != null){
-                    for(String img : response.body())
-                        images.add(imgBaseURL + img);
+                    for(Image img : response.body()) {
+                        imageIds.add(img.getId());
+                        images.add(imgBaseURL + img.getPath());
+                        likes.add(img.getLikeNum());
+                    }
 
                     myGridView.setAdapter(adapter);
 
@@ -60,7 +74,8 @@ public class ImageService extends GeneralService{
                         @Override
                         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                             Intent intent = new Intent(mainContext, GridItemActivity.class);
-                            intent.putExtra("like", likes.get(i));
+                            intent.putExtra("imageId", imageIds.get(i));
+                            intent.putExtra("likeNum", likes.get(i));
                             intent.putExtra("image", images.get(i));
                             mainContext.startActivity(intent);
                         }
@@ -70,10 +85,30 @@ public class ImageService extends GeneralService{
             }
 
             @Override
-            public void onFailure(Call<List<String>> call, Throwable t) {
+            public void onFailure(Call<List<Image>> call, Throwable t) {
 
             }
         });
+    }
+
+    public void updateLikeNum(long imgId, int likeNum){
+        Map<String, Object> params = new LinkedHashMap<>();
+        params.put("id", imgId);
+        params.put("likes", likeNum);
+        Gson gson = new Gson();
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), gson.toJson(params));
+        Call<ResponseBody> req = service.updateLikeNum(requestBody);
+        req.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+
     }
 
 

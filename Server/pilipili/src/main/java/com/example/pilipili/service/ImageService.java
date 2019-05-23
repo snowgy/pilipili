@@ -9,4 +9,6 @@ import java.util.List;
 public interface ImageService {
     List<Image> findAllImages();
     int getImageLikes(String imagePath);
+    Image getImageById(long id);
+    void save(Image image);
 }

@@ -1,9 +1,14 @@
 package com.example.pilipili.model;
 
 public class Image {
+    Long id;
     String path;
     int likeNum;
     String userName;
+
+    public Long getId() {
+        return id;
+    }
 
     public String getPath() {
         return path;
@@ -17,6 +22,9 @@ public class Image {
         return userName;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
     public void setPath(String path) {
         this.path = path;
     }

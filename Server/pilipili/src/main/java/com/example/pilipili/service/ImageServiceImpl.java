@@ -26,4 +26,15 @@ public class ImageServiceImpl implements ImageService {
         Image image = imageRepository.findImageByImagePath(imagePath);
         return image.getLikeNum();
     }
+
+    @Override
+    public Image getImageById(long id) {
+        Image image = imageRepository.findImageByImageId(id);
+        return image;
+    }
+
+    @Override
+    public void save(Image image) {
+        imageRepository.save(image);
+    }
 }

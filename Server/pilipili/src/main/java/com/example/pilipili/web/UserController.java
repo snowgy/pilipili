@@ -125,7 +125,8 @@ public final class UserController {
         List<Image> images = user.getImageList();
         List<ImageData> imageDataList = new ArrayList<>();
         for (Image image : images) {
-            ImageData imageData = new ImageData(image.getImagePath(),
+            ImageData imageData = new ImageData(image.getImageId(),
+                    image.getImagePath(),
                     image.getLikeNum(),
                     image.getUser().getUserName());
             imageDataList.add(imageData);
