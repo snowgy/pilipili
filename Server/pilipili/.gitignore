@@ -27,3 +27,7 @@ HELP.md
 
 ### VS Code ###
 .vscode/
+
+### static resource ###
+/src/main/resources
+

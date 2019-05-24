@@ -1,17 +1,23 @@
 package com.example.pilipili.web;
 
-import com.example.pilipili.model.ResponseCode;
-import com.example.pilipili.model.ResponseEntity;
-import com.example.pilipili.model.ResponseUser;
-import com.example.pilipili.model.User;
+import apple.laf.JRSUIUtils;
+import com.example.pilipili.api.ImageRepository;
+import com.example.pilipili.model.*;
+import com.example.pilipili.service.ImageService;
+import com.example.pilipili.service.UserService;
 import com.example.pilipili.service.auth.LoginService;
 import com.example.pilipili.service.auth.SignupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /** UserController Provides User APIs. */
 @RestController
@@ -22,7 +28,13 @@ public final class UserController {
     /** SignupService instance. */
     @Autowired
     private SignupService signupService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private ImageService imageService;
 
+    @Value("${file.uploadFolder}")
+    private String uploadPath;
 
     /**
      * <p>implement user Login</p>
@@ -82,18 +94,47 @@ public final class UserController {
 
     @PostMapping(value = {"/uploadImg"})
     public @ResponseBody String uploadImg(@RequestParam("file") MultipartFile file,
+                                          @RequestParam("username") String userName,
                                           HttpServletRequest request) {
-        String contentType = file.getContentType();
         String fileName = file.getOriginalFilename();
-        String filePath = getImgPath();
+        // String filePath = getImgPath();
+        userService.addUserImage(userName, uploadPath + fileName);
         try {
-            FileUtils.uploadFile(file.getBytes(), filePath, fileName);
+            FileUtils.uploadFile(file.getBytes(), uploadPath, fileName);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return filePath;
+        return fileName;
     }
 
+
+    @PostMapping(value = {"/getUserImages"})
+    public List<ImageData> getUserImages(@RequestParam String userName) {
+        User user = userService.getUserByName(userName);
+        List<Image> images = user.getImageList();
+        return fillImageList(images);
+    }
+
+    @PostMapping(value = {"/getLovedImages"})
+    public List<ImageData> getLovedImages(@RequestParam String userName) {
+        User user = userService.getUserByName(userName);
+        Set<Image> lovedImages = user.getLovedImages();
+        return fillImageList(lovedImages);
+    }
+
+    public List<ImageData> fillImageList(Collection<Image> imgs){
+        List<ImageData> imageDataList = new ArrayList<>();
+        for (Image image : imgs) {
+            String path = image.getImagePath();
+            path = path.substring(path.lastIndexOf("/")+1);
+            ImageData imageData = new ImageData(image.getImageId(),
+                    path,
+                    image.getLikeNum(),
+                    image.getOwner().getUserName());
+            imageDataList.add(imageData);
+        }
+        return imageDataList;
+    }
     public static String getImgPath() {
         String filePath = UserController.class.getClassLoader().getResource("").toString();
         File file=new File(filePath);

@@ -7,15 +7,21 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.CascadeType;
+import javax.persistence.JoinTable;
+import javax.persistence.JoinColumn;
+
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -38,13 +44,49 @@ public class User {
     @Column(name="password")
     private String password;
 
-    @JsonBackReference
+    @JsonBackReference(value = "user-own-image")
     @OneToMany(
-            mappedBy = "user",
+            mappedBy = "owner",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     private List<Image> imageList = new ArrayList<>();
+
+    @JsonBackReference(value = "user-love-image")
+    @ManyToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE,
+            CascadeType.ALL
+    })
+    @JoinTable(name="image_user",
+            joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="image_id")
+    )
+    private Set<Image> lovedImages = new HashSet<>();
+
+    public void addLoveImage(Image img){
+        lovedImages.add(img);
+        img.getLovers().add(this);
+    }
+
+    public void removeLoveImage(Image img){
+        lovedImages.remove(img);
+        img.getLovers().remove(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        User user = (User) obj;
+        return this.userId == user.userId;
+    }
+
+    @Override
+    public int hashCode() {
+        return userName.hashCode();
+    }
+
+
+
 
 
 }

@@ -1,6 +1,6 @@
 package com.example.pilipili;
 
-import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,27 +11,21 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.Toast;
+import android.util.Log;
+import android.view.*;
+import android.widget.*;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.example.pilipili.service.UploadService;
+import com.example.pilipili.utils.BitmapUtils;
+
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,41 +33,49 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jp.co.cyberagent.android.gpuimage.GPUImage;
+import jp.co.cyberagent.android.gpuimage.GPUImageDissolveBlendFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageGlassSphereFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageGrayscaleFilter;
+import jp.co.cyberagent.android.gpuimage.GPUImageLightenBlendFilter;
+import jp.co.cyberagent.android.gpuimage.GPUImageOverlayBlendFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageSketchFilter;
 
 public class CameraActivity extends AppCompatActivity implements BottomNavigationBar.OnTabSelectedListener {
 
-    // private final Activity activity;
     private File mImageFile;
     private Uri resultUri;
-    private Bitmap globalBitmap;
-    private Bitmap currentBitmap;
+    protected Bitmap globalBitmap;
+    protected Bitmap currentBitmap;
 
     private int desiredWidth = 0;
     private int desiredHeight = 0;
 
-    private GPUImage gpuImage;
+    protected GPUImage gpuImage;
     private int flag = 0;
 
-    private boolean allZero = false;
+    private ImageButton[] styleButtons = new ImageButton[NUM_STYLES];
+    private float[] styleValues = new float[NUM_STYLES];
+
+    protected boolean allZero = false;
     private static final boolean NORMALIZE_SLIDERS = true;
     private int lastOtherStyle = 1;
 
-    private ImageGridAdapter imageGridAdapter;
-    private GridView grid;
+    private final int dimFilter = 0x99000000;
+    private int currentStyle = 0;
 
     private int[] intValues;
     private float[] floatValues;
 
-    private TensorFlowInferenceInterface inferenceInterface;
+    protected TensorFlowInferenceInterface inferenceInterface;
+
+    private boolean isCompressed = false;
 
     private static final String MODEL_FILE = "file:///android_asset/stylize_quantized.pb";
 
@@ -81,63 +83,13 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     private static final String STYLE_NODE = "style_num";
     private static final String OUTPUT_NODE = "transformer/expand/conv3/conv/Sigmoid";
 
-    private static final int NUM_STYLES = 18;
-    private static final int IGNORE_IMAGE_NUM = 8;
+    private static final int NUM_STYLES = 26;
+    private static final int IGNORE_IMAGE_NUM = 0;
     private final float[] styleVals = new float[NUM_STYLES + IGNORE_IMAGE_NUM];
 
     public static final int TAKE_PHOTO_CODE = 1;
     public static final int SELECT_PHOTO_CODE = 2;
-
-    private final View.OnTouchListener gridTouchAdapter =
-            new View.OnTouchListener() {
-                ImageSlider slider = null;
-
-                @Override
-                public boolean onTouch(final View v, final MotionEvent event) {
-                    switch (event.getActionMasked()) {
-                        case MotionEvent.ACTION_DOWN:
-                            for (int i = 0; i < NUM_STYLES; ++i) {
-                                final ImageSlider child = imageGridAdapter.items[i];
-                                final Rect rect = new Rect();
-                                child.getHitRect(rect);
-                                if (rect.contains((int) event.getX(), (int) event.getY())) {
-                                    slider = child;
-                                    slider.setHilighted(true);
-                                }
-                            }
-                            // stylizeImage(globalBitmap);
-                            break;
-
-                        case MotionEvent.ACTION_MOVE:
-                            if (slider != null) {
-                                final Rect rect = new Rect();
-                                slider.getHitRect(rect);
-
-                                final float newSliderVal =
-                                        (float)
-                                                Math.min(
-                                                        1.0,
-                                                        Math.max(
-                                                                0.0, 1.0 - (event.getY() - slider.getTop()) / slider.getHeight()));
-
-                                setStyle(slider, newSliderVal);
-                                stylizeImage(globalBitmap);
-                            }
-                            break;
-
-                        case MotionEvent.ACTION_UP:
-                            if (slider != null) {
-                                slider.setHilighted(false);
-                                slider = null;
-                                // stylizeImage(globalBitmap);
-                            }
-                            break;
-
-                        default: // fall out
-                    }
-                    return true;
-                }
-            };
+    public static final int CROP_PHOTO = 3;
 
     @BindView(R.id.editImageView)
     ImageView editImageView;
@@ -148,8 +100,13 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     Button sketchButton;
     @BindView(R.id.filter_glass_btn)
     Button glassButton;
-    @BindView(R.id.remove_backgroud_btn)
-    Button removeButton;
+    @BindView(R.id.filter_lighten_btn)
+    Button lightenButton;
+    @BindView(R.id.filter_overlay_btn)
+    Button overlayButton;
+    @BindView(R.id.filter_dissolve_btn)
+    Button dissolveButton;
+
 
     private boolean isDebug() {
         return false;
@@ -161,7 +118,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         setContentView(R.layout.activity_edit);
         ButterKnife.bind(this);
         inferenceInterface = new TensorFlowInferenceInterface(getAssets(), MODEL_FILE);
-        imageGridAdapter = new ImageGridAdapter();
         BottomNavigationBar bottomNavigationBar = (BottomNavigationBar) findViewById(R.id.edit_nav_bar);
         bottomNavigationBar
                 .addItem(new BottomNavigationItem(R.mipmap.ic_outline_arrow_back_black_24dp, "back"))
@@ -171,95 +127,138 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 .setFirstSelectedPosition(0)
                 .initialise();
         bottomNavigationBar.setTabSelectedListener(this);
-        grid = (GridView) findViewById(R.id.grid_layout);
-        grid.setAdapter(imageGridAdapter);
-        grid.setOnTouchListener(gridTouchAdapter);
-        setStyle(imageGridAdapter.items[0], 1.0f);
+        LinearLayout styleScroll = findViewById(R.id.style_scroll);
+        for (int i = 0; i < NUM_STYLES; ++i) {
+            ImageButton styleSlider = new ImageButton(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+            params.setMargins(10, 0, 10, 0);
+            params.height = params.width = 200;
+            styleSlider.setLayoutParams(params);
+            styleSlider.setImageBitmap(
+                    Bitmap.createScaledBitmap(
+                            getBitmapFromAsset(CameraActivity.this,
+                                    "thumbnails/style" + i + ".jpg"),
+                            200, 200, false));
+            styleSlider.setColorFilter(dimFilter);
+            styleSlider.setOnClickListener(styleButtonListener);
+            styleButtons[i] = styleSlider;
+            styleValues[i] = 0.0f;
+            styleScroll.addView(styleSlider);
+        }
+        styleButtons[0].setColorFilter(null);
+        SeekBar seekBar = findViewById(R.id.style_value_bar);
+        seekBar.setOnSeekBarChangeListener(styleValueListener);
         if (getIntent().getIntExtra("choice", 0) == 0)
-            // tryTakePhoto();
             takePhoto();
         else {
-            // trySelectAlbum();
             selectAlbum();
         }
-
     }
 
+    private final ImageButton.OnClickListener styleButtonListener = view -> {
+        Log.d("EDIT", "styleValues: " + Arrays.toString(styleValues));
+        ImageButton button = (ImageButton) view;
+        SeekBar seekBar = findViewById(R.id.style_value_bar);
+        for (int i = 0; i < NUM_STYLES; i++) {
+            ImageButton ib = styleButtons[i];
+            if (ib.equals(button)) {
+                button.setColorFilter(null);
+                seekBar.setProgress((int)(styleValues[i] * 100.0));
+                currentStyle = i;
+            } else {
+                ib.setColorFilter(dimFilter);
+            }
+        }
+    };
 
-    private void setStyle(final ImageSlider slider, final float value) {
-        slider.setValue(value);
+    private final SeekBar.OnSeekBarChangeListener styleValueListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            styleValues[currentStyle] = seekBar.getProgress() / 100.0f;
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            ProgressDialog myDialog = new ProgressDialog(CameraActivity.this);
+            myDialog.setTitle("Processing...");
+            myDialog.setMessage("Please wait.");
+            myDialog.setIndeterminate(true);
+            myDialog.show();
+            myDialog.setCancelable(false);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        setStyle(currentStyle, styleValues[currentStyle]);
+                        stylizeImage(globalBitmap);
+                    } catch (Exception e) {
+                        Log.d("PROCESS", "run: " + e.getMessage());
+                    }
+                    myDialog.dismiss();
+                }
+            }).start();
+        }
+    };
+
+    private void setStyle(final int idx, final float value) {
         if (NORMALIZE_SLIDERS) {
             // Slider vals correspond directly to the input tensor vals, and normalization is visually
             // maintained by remanipulating non-selected sliders.
             float otherSum = 0.0f;
 
             for (int i = 0; i < NUM_STYLES; ++i) {
-                if (imageGridAdapter.items[i] != slider) {
-                    otherSum += imageGridAdapter.items[i].value;
+                if (i != idx) {
+                    otherSum += styleValues[i];
                 }
             }
             if (otherSum > 0.0) {
                 float highestOtherVal = 0;
                 final float factor = otherSum > 0.0f ? (1.0f - value) / otherSum : 0.0f;
                 for (int i = 0; i < NUM_STYLES; ++i) {
-                    final ImageSlider child = imageGridAdapter.items[i];
-                    if (child == slider) {
+                    if (i == idx)
                         continue;
-                    }
-                    final float newVal = child.value * factor;
-                    child.setValue(newVal > 0.01f ? newVal : 0.0f);
+                    final float newVal = styleValues[i] * factor;
+                    styleValues[i] = newVal > 0.01f ? newVal : 0.0f;
 
-                    if (child.value > highestOtherVal) {
+                    if (styleValues[i] > highestOtherVal) {
                         lastOtherStyle = i;
-                        highestOtherVal = child.value;
+                        highestOtherVal = styleValues[i];
                     }
                 }
             } else {
                 // Everything else is 0, so just pick a suitable slider to push up when the
                 // selected one goes down.
-                if (imageGridAdapter.items[lastOtherStyle] == slider) {
+                if (lastOtherStyle == idx) {
                     lastOtherStyle = (lastOtherStyle + 1) % NUM_STYLES;
                 }
-                imageGridAdapter.items[lastOtherStyle].setValue(1.0f - value);
+                styleValues[lastOtherStyle] = 1.0f - value;
             }
         }
-        final boolean lastAllZero = allZero;
         float sum = 0.0f;
         for (int i = 0; i < NUM_STYLES; ++i) {
-            sum += imageGridAdapter.items[i].value;
+            sum += styleValues[i];
         }
         allZero = sum == 0.0f;
         // Now update the values used for the input tensor. If nothing is set, mix in everything
         // equally. Otherwise everything is normalized to sum to 1.0.
         for (int i = 0; i < NUM_STYLES; ++i) {
-            styleVals[i] = allZero ? 1.0f / NUM_STYLES : imageGridAdapter.items[i].value / sum;
-            if (lastAllZero != allZero) {
-                imageGridAdapter.items[i].postInvalidate();
-            }
+            styleVals[i] = allZero ? 1.0f / NUM_STYLES : styleValues[i] / sum;
         }
     }
 
-    private void trySelectAlbum() {
-        if (albumPermission()) {
-            selectAlbum();
-        } else {
-            ActivityCompat.requestPermissions(CameraActivity.this, new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE}, SELECT_PHOTO_CODE);
-        }
-    }
 
     private void selectAlbum() {
         Intent albumIntent = new Intent(Intent.ACTION_PICK);
         albumIntent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(albumIntent, SELECT_PHOTO_CODE);
-    }
-
-    private boolean cameraPermission() {
-        return ContextCompat.checkSelfPermission((Context) CameraActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission((Context) CameraActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private boolean albumPermission() {
-        return ContextCompat.checkSelfPermission((Context) CameraActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void takePhoto() {
@@ -275,23 +274,12 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         }
     }
 
-    /**
-     * Try to take a photo
-     * if the permission failed, request camera and write permission
-     */
-    public void tryTakePhoto() {
-        if (cameraPermission()) {
-            takePhoto();
-        } else {
-            ActivityCompat.requestPermissions(CameraActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, TAKE_PHOTO_CODE);
-            // takePhoto();
-        }
-    }
 
     /**
      * add filter to the image
      */
     public void filterImage() {
+        isCompressed = false;
         greyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -322,16 +310,37 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 editImageView.setImageBitmap(fiteredBitmap);
             }
         });
-        removeButton.setOnClickListener(new View.OnClickListener() {
+        lightenButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 gpuImage.setImage(globalBitmap);
-                gpuImage.setFilter(new GPUImageGlassSphereFilter());
+                gpuImage.setFilter(new GPUImageLightenBlendFilter());
                 Bitmap fiteredBitmap = gpuImage.getBitmapWithFilterApplied();
                 currentBitmap = fiteredBitmap;
                 editImageView.setImageBitmap(fiteredBitmap);
             }
         });
+        overlayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gpuImage.setImage(globalBitmap);
+                gpuImage.setFilter(new GPUImageOverlayBlendFilter());
+                Bitmap fiteredBitmap = gpuImage.getBitmapWithFilterApplied();
+                currentBitmap = fiteredBitmap;
+                editImageView.setImageBitmap(fiteredBitmap);
+            }
+        });
+         dissolveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gpuImage.setImage(globalBitmap);
+                gpuImage.setFilter(new GPUImageDissolveBlendFilter());
+                Bitmap fiteredBitmap = gpuImage.getBitmapWithFilterApplied();
+                currentBitmap = fiteredBitmap;
+                editImageView.setImageBitmap(fiteredBitmap);
+            }
+        });
+
     }
 
     private Bitmap scaleBitmap(Bitmap origin, int newWidth, int newHeight) {
@@ -344,8 +353,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         float scaleHeight = ((float) newHeight) / height;
         Matrix matrix = new Matrix();
         matrix.postScale(scaleWidth, scaleHeight);
-        Bitmap newBM = Bitmap.createBitmap(origin, 0, 0, width, height, matrix, false);
-        return newBM;
+        return Bitmap.createBitmap(origin, 0, 0, width, height, matrix, false);
     }
 
     /**
@@ -353,8 +361,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
      * @param originBitmap original bitmap
      * @return
      */
-    private Bitmap stylizeImage(Bitmap originBitmap) {
-        // Bitmap bitmap = scaleBitmap(originBitmap, 256, 256); // desiredSize
+    protected Bitmap stylizeImage(Bitmap originBitmap) {
+        isCompressed = true;
         Bitmap bitmap = scaleBitmap(originBitmap, desiredWidth, desiredHeight); // desiredSize
         bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
 
@@ -391,7 +399,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     }
 
     private File createImageFile() {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        Locale locale = Locale.CHINA;
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", locale).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File imageFile = null;
         try {
@@ -401,6 +410,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         }
         return imageFile;
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -418,39 +428,42 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         if (RESULT_OK != resultCode) {
             return;
         }
-        if (requestCode == TAKE_PHOTO_CODE) {
-            if (resultUri != null) {
-                Bitmap bitmap;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), resultUri);
-                    setArgs(bitmap);
-                    // croppedBitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
-                    filterImage();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        switch (requestCode) {
+            case TAKE_PHOTO_CODE:
+                if (resultUri != null) {
+                    // cropPhoto(resultUri);
+                    Bitmap bitmap;
+                    try{
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), resultUri);
+                        Bitmap cropped = BitmapUtils.cropBitmapToSquare(bitmap);
+                        setArgs(cropped);
+                        filterImage();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
-            }
-        } else if (requestCode == SELECT_PHOTO_CODE) {
-            File imageFile = createImageFile();
-            if (imageFile == null)
-                return;
-            Uri imageUri = data.getData();
-            if (imageUri != null) {
-                Bitmap bitmap;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                    setArgs(bitmap);
-                    // croppedBitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
-                    filterImage();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-            }
+                break;
+            case SELECT_PHOTO_CODE:
+                File imageFile = createImageFile();
+                if (imageFile == null)
+                    return;
+                Uri imageUri = data.getData();
+                if (imageUri != null) {
+                    Bitmap bitmap;
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                        Bitmap cropped = BitmapUtils.cropBitmapToSquare(bitmap);
+                        setArgs(cropped);
+                        filterImage();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            default:
         }
     }
 
@@ -458,15 +471,15 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         editImageView.setImageBitmap(bitmap);
         globalBitmap = bitmap;
         currentBitmap = globalBitmap;
-        desiredWidth = 240;
-        desiredHeight = 320;
+        desiredWidth = 600;
+        desiredHeight = 600;
         gpuImage = new GPUImage(CameraActivity.this);
         intValues = new int[desiredHeight * desiredWidth];
         floatValues = new float[desiredHeight * desiredWidth * 3];
     }
 
-    private class ImageSlider extends android.support.v7.widget.AppCompatImageView {
-        private float value = 0.0f;
+    protected class ImageSlider extends android.support.v7.widget.AppCompatImageView {
+        protected float value = 0.0f;
         private boolean hilighted = false;
 
         private final Paint boxPaint;
@@ -523,49 +536,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
 
     }
 
-    private class ImageGridAdapter extends BaseAdapter {
-        final ImageSlider[] items = new ImageSlider[NUM_STYLES];
-        final ArrayList<Button> buttons = new ArrayList<>();
-
-        {
-            for (int i = 0; i < NUM_STYLES; ++i) {
-                if (items[i] == null) {
-                    final ImageSlider slider = new ImageSlider(CameraActivity.this);
-                    final Bitmap bm =
-                            getBitmapFromAsset(CameraActivity.this, "thumbnails/style" + i + ".jpg");
-                    slider.setImageBitmap(bm);
-                    items[i] = slider;
-                }
-            }
-        }
-        @Override
-        public int getCount() {
-            return buttons.size() + NUM_STYLES;
-        }
-
-        @Override
-        public Object getItem(final int position) {
-            if (position < buttons.size()) {
-                return buttons.get(position);
-            } else {
-                return items[position - buttons.size()];
-            }
-        }
-
-        @Override
-        public long getItemId(final int position) {
-            return getItem(position).hashCode();
-        }
-
-        @Override
-        public View getView(final int position, final View convertView, final ViewGroup parent) {
-            if (convertView != null) {
-                return convertView;
-            }
-            return (View) getItem(position);
-        }
-    }
-
     public static Bitmap getBitmapFromAsset(final Context context, final String filePath) {
         final AssetManager assetManager = context.getAssets();
 
@@ -578,10 +548,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         }
 
         return bitmap;
-    }
-
-    private static void rgbTransformation(Bitmap bitmap) {
-
     }
 
     /**
@@ -598,6 +564,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
             case 1:
+                isCompressed = false;
+                currentBitmap = globalBitmap;
                 editImageView.setImageBitmap(globalBitmap);
                 break;
             case 2:
@@ -612,16 +580,17 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 try {
                     File tmp = createImageFile();
                     FileOutputStream fos = new FileOutputStream(tmp);
-                    currentBitmap.compress(Bitmap.CompressFormat.JPEG, 50, fos);
-                    UploadService.upload(tmp);
+                    if (isCompressed)
+                        currentBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                    else
+                        currentBitmap.compress(Bitmap.CompressFormat.JPEG, 55, fos);
+                    UploadService uploadService = new UploadService();
+                    uploadService.upload(this, tmp);
                     fos.flush();
                     fos.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                // BitmapUtils.compressImageToFile(currentBitmap, mImageFile);
-                // UploadService.upload(mImageFile);
-
                 break;
             default:
 
@@ -651,25 +620,32 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
             case 1:
+                isCompressed = false;
+                currentBitmap = globalBitmap;
                 editImageView.setImageBitmap(globalBitmap);
                 break;
             case 2:
+                boolean success = saveImageToGallery(CameraActivity.this, currentBitmap);
+                if (success) {
+                    Toast.makeText(getBaseContext(), "successfully save to your album", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getBaseContext(), "fail to save your photo", Toast.LENGTH_LONG).show();
+                }
+                break;
+
+            case 3:
                 try {
                     File tmp = createImageFile();
                     FileOutputStream fos = new FileOutputStream(tmp);
-                    currentBitmap.compress(Bitmap.CompressFormat.JPEG, 50, fos);
-                    UploadService.upload(tmp);
+                    if (!isCompressed)
+                        currentBitmap.compress(Bitmap.CompressFormat.JPEG, 50, fos);
+                    UploadService uploadService = new UploadService();
+                    uploadService.upload(this, tmp);
                     fos.flush();
                     fos.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                // BitmapUtils.compressImageToFile(currentBitmap, mImageFile);
-                // UploadService.upload(mImageFile);
-
-                break;
-            case 3:
-                //todo implement click behavior of upload tab
                 break;
             default:
 
@@ -705,5 +681,4 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + Environment.getExternalStorageDirectory())));
         return success;
     }
-
 }

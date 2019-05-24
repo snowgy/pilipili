@@ -14,7 +14,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.pilipili.utils.Data;
 import com.example.pilipili.utils.PostUtils;
+import com.example.pilipili.utils.Session;
 
 import java.util.HashMap;
 
@@ -24,6 +26,11 @@ import butterknife.ButterKnife;
 /** Signup Activity */
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
+    protected ProgressDialog progressDialog;
+    private String globalUserName = "";
+
+    private static String baseURL = Data.baseUrl;
+
     @BindView(R.id.user_name)
     EditText userName;
     @BindView(R.id.input_password)
@@ -58,6 +65,15 @@ public class SignupActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (progressDialog != null){
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }
+
     /**
      * <p>Implement user login</p>
      * <p>1. Read User Input </p>
@@ -73,14 +89,15 @@ public class SignupActivity extends AppCompatActivity {
         }
 
         signupButton.setEnabled(false);
-        final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this,
+        progressDialog = new ProgressDialog(SignupActivity.this,
                 R.style.Theme_AppCompat_DayNight);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Creating Account...");
         progressDialog.show();
-        String url = "http://10.20.35.198:8080/userSignup";
+        String url = baseURL + "/userSignup";
         String userNameValue = userName.getText().toString();
         String passwordValue = password.getText().toString();
+        globalUserName = userNameValue;
         HashMap<String, String> parameters = new HashMap<>();
         parameters.put("userName", userNameValue);
         parameters.put("password", passwordValue);
@@ -125,6 +142,8 @@ public class SignupActivity extends AppCompatActivity {
      * Specify the behavior when signup success
      */
     public void onSignupSuccess() {
+        Session.setUserName(globalUserName);
+        Session.setLogin(true);
         signupButton.setEnabled(true);
         setResult(RESULT_OK, null);
         finish();

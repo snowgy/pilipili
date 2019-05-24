@@ -5,15 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.ManyToOne;
-import javax.persistence.JoinColumn;
-import javax.persistence.FetchType;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -30,8 +24,38 @@ public class Image {
     @Column(name="image_path")
     private String imagePath;
 
-    @JsonBackReference
+    @Column(name="like_num")
+    private int likeNum;
+
+    @JsonBackReference(value = "user-own-image")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", nullable = false)
-    private User user;
+    private User owner;
+
+
+    @JsonBackReference(value = "user-love-image")
+    @ManyToMany(mappedBy = "lovedImages")
+    private Set<User> lovers = new HashSet<>();
+
+    public void addUser(User user){
+        lovers.add(user);
+        user.getLovedImages().add(this);
+    }
+
+    public void remove(User user){
+        lovers.remove(user);
+        user.getLovedImages().remove(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Image user = (Image) obj;
+        return this.imageId == user.imageId;
+    }
+
+
+    public Set<User> getLovers() {
+        return lovers;
+    }
+
 }

@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.pilipili.utils.Data;
 import com.example.pilipili.utils.PostUtils;
 import com.example.pilipili.utils.Session;
 
@@ -26,6 +27,10 @@ import butterknife.ButterKnife;
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
+    protected ProgressDialog progressDialog;
+    private static String baseURL = Data.baseUrl;
+    private String globalUserName = "";
+
     @BindView(R.id.user_name)
     EditText userName;
     @BindView(R.id.input_password)
@@ -62,6 +67,15 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (progressDialog != null){
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }
+
     /**
      * <p>Implement user login</p>
      * <p>1. Read User Input </p>
@@ -78,14 +92,15 @@ public class LoginActivity extends AppCompatActivity {
 
         loginButton.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
+        progressDialog = new ProgressDialog(LoginActivity.this,
                 R.style.Theme_AppCompat_DayNight);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Authenticating...");
         progressDialog.show();
 
-        String url = "http://10.20.35.198:8080/userLogin";
+        String url = baseURL + "/userLogin";
         String userNameValue = userName.getText().toString();
+        globalUserName = userNameValue;
         String passwordValue = password.getText().toString();
         HashMap<String, String> parameters = new HashMap<>();
         parameters.put("userName", userNameValue);
@@ -141,7 +156,8 @@ public class LoginActivity extends AppCompatActivity {
      */
     public void onLoginSuccess() {
         loginButton.setEnabled(true);
-        Session.isLogin = true;
+        Session.setLogin(true);
+        Session.setUserName(globalUserName);
         finish();
     }
 
