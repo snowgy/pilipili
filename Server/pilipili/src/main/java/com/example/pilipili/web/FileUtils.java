@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class FileUtils {
+public final class FileUtils {
+    private FileUtils(){
+
+    }
     public static void uploadFile(byte[] file, String filePath, String fileName) {
         File targetFile = new File(filePath);
         if(!targetFile.exists()){
