@@ -33,8 +33,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public Image getImageById(long id) {
-        Image image = imageRepository.findImageByImageId(id);
-        return image;
+        return imageRepository.findImageByImageId(id);
     }
 
     @Override
@@ -42,18 +41,17 @@ public class ImageServiceImpl implements ImageService {
         imageRepository.save(image);
     }
 
-    @Override
-    public void lovePhoto(long imgId) {
-
-    }
 
     @Override
     public void deletePhoto(long imgId) {
         Image img = imageRepository.findImageByImageId(imgId);
-        Set<User> users = img.getLovers();
-        for(User user: users){
-            user.removeLoveImage(img);
+        if (img != null){
+            Set<User> users = img.getLovers();
+            for(User user: users){
+                user.removeLoveImage(img);
+            }
+            imageRepository.delete(img);
         }
-        imageRepository.delete(img);
+
     }
 }

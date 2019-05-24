@@ -1,6 +1,6 @@
 package com.example.pilipili.model;
 
-public class LikeForm {
+public final class LikeForm {
     String userName;
     long id;
     int likes;
