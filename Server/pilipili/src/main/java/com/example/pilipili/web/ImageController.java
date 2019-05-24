@@ -21,6 +21,10 @@ public class ImageController {
     UserService userService;
 
 
+    /**
+     * get all the images
+     * @return all the images
+     */
     @PostMapping(value = {"/getAllImages"})
     public List<ImageData> getAllImages() {
         List<Image> imagesList = imageService.findAllImages();
@@ -37,15 +41,29 @@ public class ImageController {
         return imageDataList;
     }
 
+    /**
+     * delete one image by id
+     * @param imgId image id
+     */
     @PostMapping(value = {"/deleteImage"})
     public void deletImage(@RequestParam("imgId") long imgId) {
         imageService.deletePhoto(imgId);
     }
+
+    /**
+     * get image like number by image path
+     * @param imagePath image path
+     * @return
+     */
     @PostMapping(value = {"/getLikeNumber"})
     public int getLikeNumber(@RequestParam("path") String imagePath) {
         return imageService.getImageLikes(imagePath);
     }
 
+    /**
+     * update a image like number
+     * @param likeForm
+     */
     @PostMapping(value = {"/updateLikeNum"})
     public void updateLikeNum(@RequestBody LikeForm likeForm) {
         User user = userService.getUserByName(likeForm.getUserName());

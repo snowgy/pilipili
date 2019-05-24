@@ -11,6 +11,5 @@ public interface ImageService {
     int getImageLikes(String imagePath);
     Image getImageById(long id);
     void save(Image image);
-    void lovePhoto(long imgId);
     void deletePhoto(long imgId);
 }

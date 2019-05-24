@@ -92,6 +92,13 @@ public final class UserController {
 
     }
 
+    /**
+     * upload a image to server
+     * @param file file
+     * @param userName userName
+     * @param request http request
+     * @return
+     */
     @PostMapping(value = {"/uploadImg"})
     public @ResponseBody String uploadImg(@RequestParam("file") MultipartFile file,
                                           @RequestParam("username") String userName,
@@ -108,6 +115,11 @@ public final class UserController {
     }
 
 
+    /**
+     * Get all the images belong to one user
+     * @param userName userName
+     * @return all user images
+     */
     @PostMapping(value = {"/getUserImages"})
     public List<ImageData> getUserImages(@RequestParam String userName) {
         User user = userService.getUserByName(userName);
@@ -116,6 +128,11 @@ public final class UserController {
         return imageDataList;
     }
 
+    /**
+     * Get all the images that one user likes
+     * @param userName userName
+     * @return all the images the user liked
+     */
     @PostMapping(value = {"/getLovedImages"})
     public List<ImageData> getLovedImages(@RequestParam String userName) {
         User user = userService.getUserByName(userName);
@@ -124,7 +141,8 @@ public final class UserController {
         return imageDataList;
     }
 
-    public List<ImageData> fillImageList(Collection<Image> imgs){
+
+    private List<ImageData> fillImageList(Collection<Image> imgs){
         List<ImageData> imageDataList = new ArrayList<>();
         for (Image image : imgs) {
             String path = image.getImagePath();
@@ -136,16 +154,6 @@ public final class UserController {
             imageDataList.add(imageData);
         }
         return imageDataList;
-    }
-    public static String getImgPath() {
-        String filePath = UserController.class.getClassLoader().getResource("").toString();
-        File file=new File(filePath);
-        filePath =file.getParent();
-        int s = filePath.indexOf("/");
-        int e = filePath.lastIndexOf("/");
-        filePath = filePath.substring(s, e+1);
-        filePath += "/src/main/resources/static/img/";
-        return filePath;
     }
 
 }

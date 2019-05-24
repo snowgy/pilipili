@@ -15,6 +15,11 @@ import java.util.Set;
 public class ImageServiceImpl implements ImageService {
     @Autowired
     ImageRepository imageRepository;
+
+    /**
+     * find all the images
+     * @return all images in the database
+     */
     @Override
     public List<Image> findAllImages() {
         return imageRepository.findAll();
@@ -31,22 +36,30 @@ public class ImageServiceImpl implements ImageService {
         return image.getLikeNum();
     }
 
+    /**
+     * Get one image by id
+     * @param id image id
+     * @return image object
+     */
     @Override
     public Image getImageById(long id) {
         Image image = imageRepository.findImageByImageId(id);
         return image;
     }
 
+    /**
+     * save one image
+     * @param image image object
+     */
     @Override
     public void save(Image image) {
         imageRepository.save(image);
     }
 
-    @Override
-    public void lovePhoto(long imgId) {
-
-    }
-
+    /**
+     * 
+     * @param imgId
+     */
     @Override
     public void deletePhoto(long imgId) {
         Image img = imageRepository.findImageByImageId(imgId);
