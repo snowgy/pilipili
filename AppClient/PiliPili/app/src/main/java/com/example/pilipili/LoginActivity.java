@@ -26,6 +26,7 @@ import butterknife.ButterKnife;
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
+    private ProgressDialog progressDialog;
     // private static String baseURL = "http://10.20.48.113:8080";
     private static String baseURL = "http://10.20.35.198:8080";
     private String globalUserName = "";
@@ -66,6 +67,15 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (progressDialog != null){
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }
+
     /**
      * <p>Implement user login</p>
      * <p>1. Read User Input </p>
@@ -82,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
 
         loginButton.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
+        progressDialog = new ProgressDialog(LoginActivity.this,
                 R.style.Theme_AppCompat_DayNight);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Authenticating...");

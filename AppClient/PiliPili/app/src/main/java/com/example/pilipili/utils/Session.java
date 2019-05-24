@@ -9,4 +9,8 @@ public class Session {
     public static void setSession() {
         isLogin = false;
     }
+    public static void clear() {
+        isLogin = false;
+        userName = "";
+    }
 }

@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                 .addItem(new BottomNavigationItem(R.drawable.ic_camera_enhance_black_24dp, "camera"))
                 .addItem(new BottomNavigationItem(R.drawable.ic_favorite_border_black_24dp, "love"))
                 .addItem(new BottomNavigationItem(R.drawable.ic_person_outline_black_24dp, "me"))
+                .addItem(new BottomNavigationItem(R.mipmap.ic_outline_arrow_forward_black_24dp, "leave"))
                 .setFirstSelectedPosition(0)
                 .initialise();
         imageService = new ImageService();
@@ -90,6 +91,23 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                 break;
             case 3:
                 imageService.getUserImages(MainActivity.this, gridView);
+                break;
+            case 4:
+                new AlertDialog.Builder(this)
+                        .setTitle("Sure to log out?")
+                        .setItems(new String[]{"Yes", "Cancel"}, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if (i == 0) {
+                                    Session.clear();    // clear the userSession
+                                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                                    startActivity(intent);
+                                }
+                            }
+                        })
+                        .create()
+                        .show();
+
                 break;
             default:
 
@@ -143,6 +161,23 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                 break;
             case 3:
                 imageService.getUserImages(MainActivity.this, gridView);
+                break;
+            case 4:
+                new AlertDialog.Builder(this)
+                        .setTitle("Sure to log out?")
+                        .setItems(new String[]{"Yes", "Cancel"}, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if (i == 0) {
+                                    Session.clear();    // clear the userSession
+                                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                                    startActivity(intent);
+                                }
+                            }
+                        })
+                        .create()
+                        .show();
+
                 break;
         }
 
