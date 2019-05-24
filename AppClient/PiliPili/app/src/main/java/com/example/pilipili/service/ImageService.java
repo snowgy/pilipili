@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.example.pilipili.GridItemActivity;
 import com.example.pilipili.R;
 import com.example.pilipili.model.Image;
+import com.example.pilipili.utils.Data;
 import com.example.pilipili.utils.Session;
 import com.google.gson.Gson;
 
@@ -41,7 +42,7 @@ public class ImageService extends GeneralService{
     private List<Image> favoImages = new ArrayList<>();
 
     // String imgBaseURL = "http://10.20.48.113:8080/api/file/";
-    String imgBaseURL = "http://10.20.35.198:8080/api/file/";
+    String imgBaseURL = Data.imgBaseUrl;
     CustomAdapter adapter;
     GridView myGridView;
 

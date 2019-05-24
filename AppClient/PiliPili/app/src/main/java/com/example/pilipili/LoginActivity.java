@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.pilipili.utils.Data;
 import com.example.pilipili.utils.PostUtils;
 import com.example.pilipili.utils.Session;
 
@@ -27,8 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
     private ProgressDialog progressDialog;
-    // private static String baseURL = "http://10.20.48.113:8080";
-    private static String baseURL = "http://10.20.35.198:8080";
+    private static String baseURL = Data.baseUrl;
     private String globalUserName = "";
 
     @BindView(R.id.user_name)
