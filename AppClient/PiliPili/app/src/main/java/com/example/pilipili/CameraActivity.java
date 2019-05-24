@@ -660,6 +660,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
      */
     public boolean saveImageToGallery(Context context, Bitmap bitmap) {
         boolean success = false;
+        mImageFile = createImageFile();
         flag++;
         // save image first
         try {
