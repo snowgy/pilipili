@@ -1,5 +1,6 @@
 package com.example.pilipili;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,7 +11,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,17 +18,11 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.Toast;
+import android.util.Log;
+import android.view.*;
+import android.widget.*;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
-import com.example.pilipili.model.Image;
 import com.example.pilipili.service.UploadService;
 import com.example.pilipili.utils.BitmapUtils;
 
@@ -39,25 +33,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jp.co.cyberagent.android.gpuimage.GPUImage;
-import jp.co.cyberagent.android.gpuimage.GPUImageBulgeDistortionFilter;
-import jp.co.cyberagent.android.gpuimage.GPUImageColorBurnBlendFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageDissolveBlendFilter;
-import jp.co.cyberagent.android.gpuimage.GPUImageEmbossFilter;
-import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageGlassSphereFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageGrayscaleFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageLightenBlendFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageOverlayBlendFilter;
-import jp.co.cyberagent.android.gpuimage.GPUImageScreenBlendFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageSketchFilter;
-import jp.co.cyberagent.android.gpuimage.GPUImageVignetteFilter;
 
 public class CameraActivity extends AppCompatActivity implements BottomNavigationBar.OnTabSelectedListener {
 
@@ -72,12 +60,15 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     protected GPUImage gpuImage;
     private int flag = 0;
 
+    private ImageButton[] styleButtons = new ImageButton[NUM_STYLES];
+    private float[] styleValues = new float[NUM_STYLES];
+
     protected boolean allZero = false;
     private static final boolean NORMALIZE_SLIDERS = true;
     private int lastOtherStyle = 1;
 
-    protected ImageGridAdapter imageGridAdapter;
-    protected GridView grid;
+    private final int dimFilter = 0x99000000;
+    private int currentStyle = 0;
 
     private int[] intValues;
     private float[] floatValues;
@@ -92,62 +83,13 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     private static final String STYLE_NODE = "style_num";
     private static final String OUTPUT_NODE = "transformer/expand/conv3/conv/Sigmoid";
 
-    private static final int NUM_STYLES = 8;
-    private static final int IGNORE_IMAGE_NUM = 18;
+    private static final int NUM_STYLES = 26;
+    private static final int IGNORE_IMAGE_NUM = 0;
     private final float[] styleVals = new float[NUM_STYLES + IGNORE_IMAGE_NUM];
 
     public static final int TAKE_PHOTO_CODE = 1;
     public static final int SELECT_PHOTO_CODE = 2;
     public static final int CROP_PHOTO = 3;
-
-    private final View.OnTouchListener gridTouchAdapter =
-            new View.OnTouchListener() {
-                ImageSlider slider = null;
-
-                @Override
-                public boolean onTouch(final View v, final MotionEvent event) {
-                    switch (event.getActionMasked()) {
-                        case MotionEvent.ACTION_DOWN:
-                            for (int i = 0; i < NUM_STYLES; ++i) {
-                                final ImageSlider child = imageGridAdapter.items[i];
-                                final Rect rect = new Rect();
-                                child.getHitRect(rect);
-                                if (rect.contains((int) event.getX(), (int) event.getY())) {
-                                    slider = child;
-                                    slider.setHilighted(true);
-                                }
-                            }
-                            break;
-
-                        case MotionEvent.ACTION_MOVE:
-                            if (slider != null) {
-                                final Rect rect = new Rect();
-                                slider.getHitRect(rect);
-
-                                final float newSliderVal =
-                                        (float)
-                                                Math.min(
-                                                        1.0,
-                                                        Math.max(
-                                                                0.0, 1.0 - (event.getY() - slider.getTop()) / slider.getHeight()));
-
-                                setStyle(slider, newSliderVal);
-                                stylizeImage(globalBitmap);
-                            }
-                            break;
-
-                        case MotionEvent.ACTION_UP:
-                            if (slider != null) {
-                                slider.setHilighted(false);
-                                slider = null;
-                            }
-                            break;
-
-                        default: // fall out
-                    }
-                    return true;
-                }
-            };
 
     @BindView(R.id.editImageView)
     ImageView editImageView;
@@ -176,7 +118,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         setContentView(R.layout.activity_edit);
         ButterKnife.bind(this);
         inferenceInterface = new TensorFlowInferenceInterface(getAssets(), MODEL_FILE);
-        imageGridAdapter = new ImageGridAdapter();
         BottomNavigationBar bottomNavigationBar = (BottomNavigationBar) findViewById(R.id.edit_nav_bar);
         bottomNavigationBar
                 .addItem(new BottomNavigationItem(R.mipmap.ic_outline_arrow_back_black_24dp, "back"))
@@ -186,71 +127,133 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 .setFirstSelectedPosition(0)
                 .initialise();
         bottomNavigationBar.setTabSelectedListener(this);
-        grid = (GridView) findViewById(R.id.grid_layout);
-        grid.setAdapter(imageGridAdapter);
-        grid.setOnTouchListener(gridTouchAdapter);
-        setStyle(imageGridAdapter.items[0], 1.0f);
+        LinearLayout styleScroll = findViewById(R.id.style_scroll);
+        for (int i = 0; i < NUM_STYLES; ++i) {
+            ImageButton styleSlider = new ImageButton(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+            params.setMargins(10, 0, 10, 0);
+            params.height = params.width = 200;
+            styleSlider.setLayoutParams(params);
+            styleSlider.setImageBitmap(
+                    Bitmap.createScaledBitmap(
+                            getBitmapFromAsset(CameraActivity.this,
+                                    "thumbnails/style" + i + ".jpg"),
+                            200, 200, false));
+            styleSlider.setColorFilter(dimFilter);
+            styleSlider.setOnClickListener(styleButtonListener);
+            styleButtons[i] = styleSlider;
+            styleValues[i] = 0.0f;
+            styleScroll.addView(styleSlider);
+        }
+        styleButtons[0].setColorFilter(null);
+        SeekBar seekBar = findViewById(R.id.style_value_bar);
+        seekBar.setOnSeekBarChangeListener(styleValueListener);
         if (getIntent().getIntExtra("choice", 0) == 0)
             takePhoto();
         else {
             selectAlbum();
         }
-
     }
 
+    private final ImageButton.OnClickListener styleButtonListener = view -> {
+        Log.d("EDIT", "styleValues: " + Arrays.toString(styleValues));
+        ImageButton button = (ImageButton) view;
+        SeekBar seekBar = findViewById(R.id.style_value_bar);
+        for (int i = 0; i < NUM_STYLES; i++) {
+            ImageButton ib = styleButtons[i];
+            if (ib.equals(button)) {
+                button.setColorFilter(null);
+                seekBar.setProgress((int)(styleValues[i] * 100.0));
+                currentStyle = i;
+            } else {
+                ib.setColorFilter(dimFilter);
+            }
+        }
+    };
 
-    protected void setStyle(final ImageSlider slider, final float value) {
-        slider.setValue(value);
+    private final SeekBar.OnSeekBarChangeListener styleValueListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            styleValues[currentStyle] = seekBar.getProgress() / 100.0f;
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            ProgressDialog myDialog = new ProgressDialog(CameraActivity.this);
+            myDialog.setTitle("Processing...");
+            myDialog.setMessage("Please wait.");
+            myDialog.setIndeterminate(true);
+            myDialog.show();
+            myDialog.setCancelable(false);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        setStyle(currentStyle, styleValues[currentStyle]);
+                        stylizeImage(globalBitmap);
+                    } catch (Exception e) {
+                        Log.d("PROCESS", "run: " + e.getMessage());
+                    }
+                    myDialog.dismiss();
+                }
+            }).start();
+        }
+    };
+
+    private void setStyle(final int idx, final float value) {
         if (NORMALIZE_SLIDERS) {
             // Slider vals correspond directly to the input tensor vals, and normalization is visually
             // maintained by remanipulating non-selected sliders.
             float otherSum = 0.0f;
 
             for (int i = 0; i < NUM_STYLES; ++i) {
-                if (imageGridAdapter.items[i] != slider) {
-                    otherSum += imageGridAdapter.items[i].value;
+                if (i != idx) {
+                    otherSum += styleValues[i];
                 }
             }
             if (otherSum > 0.0) {
                 float highestOtherVal = 0;
                 final float factor = otherSum > 0.0f ? (1.0f - value) / otherSum : 0.0f;
                 for (int i = 0; i < NUM_STYLES; ++i) {
-                    final ImageSlider child = imageGridAdapter.items[i];
-                    if (child.equals(slider)) {
+                    if (i == idx)
                         continue;
-                    }
-                    final float newVal = child.value * factor;
-                    child.setValue(newVal > 0.01f ? newVal : 0.0f);
+                    final float newVal = styleValues[i] * factor;
+                    styleValues[i] = newVal > 0.01f ? newVal : 0.0f;
 
-                    if (child.value > highestOtherVal) {
+                    if (styleValues[i] > highestOtherVal) {
                         lastOtherStyle = i;
-                        highestOtherVal = child.value;
+                        highestOtherVal = styleValues[i];
                     }
                 }
             } else {
                 // Everything else is 0, so just pick a suitable slider to push up when the
                 // selected one goes down.
-                if (imageGridAdapter.items[lastOtherStyle] == slider) {
+                if (lastOtherStyle == idx) {
                     lastOtherStyle = (lastOtherStyle + 1) % NUM_STYLES;
                 }
-                imageGridAdapter.items[lastOtherStyle].setValue(1.0f - value);
+                styleValues[lastOtherStyle] = 1.0f - value;
             }
         }
-        final boolean lastAllZero = allZero;
         float sum = 0.0f;
         for (int i = 0; i < NUM_STYLES; ++i) {
-            sum += imageGridAdapter.items[i].value;
+            sum += styleValues[i];
         }
         allZero = sum == 0.0f;
         // Now update the values used for the input tensor. If nothing is set, mix in everything
         // equally. Otherwise everything is normalized to sum to 1.0.
         for (int i = 0; i < NUM_STYLES; ++i) {
-            styleVals[i] = allZero ? 1.0f / NUM_STYLES : imageGridAdapter.items[i].value / sum;
-            if (lastAllZero != allZero) {
-                imageGridAdapter.items[i].postInvalidate();
-            }
+            styleVals[i] = allZero ? 1.0f / NUM_STYLES : styleValues[i] / sum;
         }
     }
+
 
     private void selectAlbum() {
         Intent albumIntent = new Intent(Intent.ACTION_PICK);
@@ -360,7 +363,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
      */
     protected Bitmap stylizeImage(Bitmap originBitmap) {
         isCompressed = true;
-        // Bitmap bitmap = scaleBitmap(originBitmap, 256, 256); // desiredSize
         Bitmap bitmap = scaleBitmap(originBitmap, desiredWidth, desiredHeight); // desiredSize
         bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
 
@@ -532,48 +534,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
             this.postInvalidate();
         }
 
-    }
-
-    protected class ImageGridAdapter extends BaseAdapter {
-        protected final ImageSlider[] items = new ImageSlider[NUM_STYLES];
-        final ArrayList<Button> buttons = new ArrayList<>();
-        public ImageGridAdapter() {
-            for (int i = 0; i < NUM_STYLES; ++i) {
-                if (items[i] == null) {
-                    final ImageSlider slider = new ImageSlider(CameraActivity.this);
-                    final Bitmap bm =
-                            getBitmapFromAsset(CameraActivity.this, "thumbnails/style" + i + ".jpg");
-                    slider.setImageBitmap(bm);
-                    items[i] = slider;
-                }
-            }
-        }
-        @Override
-        public int getCount() {
-            return buttons.size() + NUM_STYLES;
-        }
-
-        @Override
-        public Object getItem(final int position) {
-            if (position < buttons.size()) {
-                return buttons.get(position);
-            } else {
-                return items[position - buttons.size()];
-            }
-        }
-
-        @Override
-        public long getItemId(final int position) {
-            return getItem(position).hashCode();
-        }
-
-        @Override
-        public View getView(final int position, final View convertView, final ViewGroup parent) {
-            if (convertView != null) {
-                return convertView;
-            }
-            return (View) getItem(position);
-        }
     }
 
     public static Bitmap getBitmapFromAsset(final Context context, final String filePath) {

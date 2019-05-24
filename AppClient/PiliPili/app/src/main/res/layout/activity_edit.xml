@@ -5,11 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CameraActivity">
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="horizontal"-->
-        <!--android:gravity="center">-->
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,117 +16,97 @@
             android:layout_height="260dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            />
+            android:contentDescription="Image Preview"/>
     </RelativeLayout>
 
-    <!--</LinearLayout>-->
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
+                          android:layout_below="@id/imageparent"
+                          android:id="@+id/filter_bar">
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:orientation="horizontal"
+                android:gravity="center">
+            <Button
+                    android:id="@+id/filter_grey_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
+                    android:text="Grey"
+                    android:textSize="16sp" />
+            <Button
+                    android:id="@+id/filter_sketch_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
+                    android:text="Sketch"
+                    android:textSize="16sp" />
+            <Button
+                    android:id="@+id/filter_glass_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
+                    android:text="Glass"
+                    android:textSize="16sp" />
+            <Button
+                    android:id="@+id/filter_lighten_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
+                    android:text="Lighten"
+                    android:textSize="14sp" />
+            <Button
+                    android:id="@+id/filter_overlay_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
+                    android:text="Overlay"
+                    android:textSize="14sp" />
+            <Button
+                    android:id="@+id/filter_dissolve_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
+                    android:text="Dissolve"
+                    android:textSize="14sp" />
 
+        </LinearLayout>
+    </HorizontalScrollView>
 
-    <LinearLayout
-        android:id="@+id/filter_bar_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_below="@id/imageparent"
-        >
-        <Button
-            android:id="@+id/filter_grey_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:layout_weight="1"
-            android:text="Grey"
-            android:textSize="16sp" />
-        <Button
-            android:id="@+id/filter_sketch_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:layout_weight="1"
-            android:text="Sketch"
-            android:textSize="16sp" />
-        <Button
-            android:id="@+id/filter_glass_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:layout_weight="1"
-            android:text="Glass"
-            android:textSize="16sp" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_below="@id/filter_bar"
+                android:layout_above="@id/edit_nav_bar">
+        <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:orientation="vertical">
 
-    </LinearLayout>
+            <HorizontalScrollView android:layout_width="match_parent" android:layout_height="match_parent"
+                                  android:stretchMode="columnWidth"
+                                  android:id="@+id/style_scroll_view">
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                              android:id="@+id/style_scroll"
+                              android:orientation="horizontal">
+                </LinearLayout>
+            </HorizontalScrollView>
 
-    <LinearLayout
-        android:id="@+id/filter_bar_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_below="@id/filter_bar_1"
-        >
-        <Button
-            android:id="@+id/filter_lighten_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:layout_weight="1"
-            android:text="Lighten"
-            android:textSize="16sp" />
-        <Button
-            android:id="@+id/filter_overlay_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:layout_weight="1"
-            android:text="Overlay"
-            android:textSize="16sp" />
-        <Button
-            android:id="@+id/filter_dissolve_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:layout_weight="1"
-            android:text="Dissolve"
-            android:textSize="14sp" />
-
-    </LinearLayout>
-
-
-    <!--<LinearLayout-->
-        <!--android:id="@+id/remove_backgroud_bar"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_margin="10dp"-->
-        <!--android:orientation="horizontal"-->
-        <!--android:gravity="center"-->
-        <!--android:layout_below="@id/filter_bar"-->
-        <!--&gt;-->
-        <!--<Button-->
-            <!--android:id="@+id/remove_backgroud_btn"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginRight="20dp"-->
-            <!--android:layout_weight="1"-->
-            <!--android:text="Remove Backgroud"-->
-            <!--android:textSize="16sp" />-->
-    <!--</LinearLayout>-->
-
-    <GridView
-        android:id="@+id/grid_layout"
-        android:numColumns="4"
-        android:layout_below="@+id/filter_bar_2"
-        android:layout_above="@+id/edit_nav_bar"
-        android:stretchMode="columnWidth"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:horizontalSpacing="2dp"
-        android:verticalSpacing="2dp"/>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                          android:layout_below="@id/style_scroll_view"
+                          android:layout_marginTop="10dp"
+                          android:layout_marginBottom="10dp"
+                          android:orientation="vertical">
+                <SeekBar android:layout_width="match_parent" android:layout_height="wrap_content"
+                         android:id="@+id/style_value_bar"
+                         android:max="100" android:progress="0" />
+            </LinearLayout>
+        </RelativeLayout>
+    </ScrollView>
 
     <com.ashokvarma.bottomnavigation.BottomNavigationBar
         android:layout_gravity="bottom"

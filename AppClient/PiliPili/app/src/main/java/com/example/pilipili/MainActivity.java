@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
     GridView gridView;
 
     public static final int SELECT_PHOTO_CODE = 2;
-    public static int HOME = 1;
+    private static int HOME = 1;
     public ImageService imageService;
 
     @Override
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        if (!Session.isLogin){
+        if (!Session.isLogin()){
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }

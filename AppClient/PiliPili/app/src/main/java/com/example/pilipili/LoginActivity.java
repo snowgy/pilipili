@@ -156,8 +156,8 @@ public class LoginActivity extends AppCompatActivity {
      */
     public void onLoginSuccess() {
         loginButton.setEnabled(true);
-        Session.isLogin = true;
-        Session.userName = globalUserName;
+        Session.setLogin(true);
+        Session.setUserName(globalUserName);
         finish();
     }
 

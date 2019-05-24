@@ -26,11 +26,9 @@ public final class BitmapUtils {
         int options = 50;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
+        try (FileOutputStream fos =  new FileOutputStream(file)){
             fos.write(baos.toByteArray());
             fos.flush();
-            fos.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

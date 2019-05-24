@@ -5,6 +5,7 @@ import android.support.test.espresso.DataInteraction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,13 +34,19 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class LikeTest {
+public class FilterTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
+    @Rule
+    public GrantPermissionRule mGrantPermissionRule =
+            GrantPermissionRule.grant(
+                    "android.permission.CAMERA",
+                    "android.permission.WRITE_EXTERNAL_STORAGE");
+
     @Test
-    public void test02() {
+    public void filterTest() {
         ViewInteraction appCompatEditText = onView(
                 allOf(withId(R.id.user_name),
                         childAtPosition(
@@ -56,7 +63,7 @@ public class LikeTest {
                                         withClassName(is("android.support.design.widget.TextInputLayout")),
                                         0),
                                 0)));
-        appCompatEditText2.perform(scrollTo(), replaceText("1234"), closeSoftKeyboard());
+        appCompatEditText2.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
 
         ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.btn_login), withText("Login"),
@@ -82,91 +89,50 @@ public class LikeTest {
                                 childAtPosition(
                                         withId(R.id.bottom_navigation_bar_container),
                                         1)),
-                        2),
-                        isDisplayed()));
-        shiftingBottomNavigationTab.perform(click());
-
-        DataInteraction relativeLayout = onData(anything())
-                .inAdapterView(allOf(withId(R.id.gridView),
-                        childAtPosition(
-                                withClassName(is("android.widget.RelativeLayout")),
-                                0)))
-                .atPosition(2);
-        relativeLayout.perform(click());
-
-        ViewInteraction fixedBottomNavigationTab = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.bottom_navigation_bar_item_container),
-                                childAtPosition(
-                                        withId(R.id.bottom_navigation_bar_container),
-                                        1)),
                         1),
                         isDisplayed()));
-        fixedBottomNavigationTab.perform(click());
-
-        ViewInteraction fixedBottomNavigationTab2 = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.bottom_navigation_bar_item_container),
-                                childAtPosition(
-                                        withId(R.id.bottom_navigation_bar_container),
-                                        1)),
-                        2),
-                        isDisplayed()));
-        fixedBottomNavigationTab2.perform(click());
+        shiftingBottomNavigationTab.perform(click());
 
         DataInteraction appCompatTextView = onData(anything())
                 .inAdapterView(allOf(withClassName(is("com.android.internal.app.AlertController$RecycleListView")),
                         childAtPosition(
                                 withClassName(is("android.widget.FrameLayout")),
                                 0)))
-                .atPosition(1);
+                .atPosition(0);
         appCompatTextView.perform(click());
 
-        ViewInteraction fixedBottomNavigationTab3 = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.bottom_navigation_bar_item_container),
-                                childAtPosition(
-                                        withId(R.id.bottom_navigation_bar_container),
-                                        1)),
-                        2),
-                        isDisplayed()));
-        fixedBottomNavigationTab3.perform(click());
-
-        DataInteraction appCompatTextView2 = onData(anything())
-                .inAdapterView(allOf(withClassName(is("com.android.internal.app.AlertController$RecycleListView")),
+        ViewInteraction appCompatButton2 = onView(
+                allOf(withId(R.id.filter_grey_btn), withText("Grey"),
                         childAtPosition(
-                                withClassName(is("android.widget.FrameLayout")),
-                                0)))
-                .atPosition(0);
-        appCompatTextView2.perform(click());
-
-        ViewInteraction fixedBottomNavigationTab4 = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.bottom_navigation_bar_item_container),
-                                childAtPosition(
-                                        withId(R.id.bottom_navigation_bar_container),
-                                        1)),
-                        0),
+                                allOf(withId(R.id.filter_bar),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.RelativeLayout")),
+                                                1)),
+                                0),
                         isDisplayed()));
-        fixedBottomNavigationTab4.perform(click());
+        appCompatButton2.perform(click());
 
-        ViewInteraction shiftingBottomNavigationTab2 = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.bottom_navigation_bar_item_container),
-                                childAtPosition(
-                                        withId(R.id.bottom_navigation_bar_container),
-                                        1)),
-                        4),
-                        isDisplayed()));
-        shiftingBottomNavigationTab2.perform(click());
-
-        DataInteraction appCompatTextView3 = onData(anything())
-                .inAdapterView(allOf(withClassName(is("com.android.internal.app.AlertController$RecycleListView")),
+        ViewInteraction appCompatButton3 = onView(
+                allOf(withId(R.id.filter_sketch_btn), withText("Sketch"),
                         childAtPosition(
-                                withClassName(is("android.widget.FrameLayout")),
-                                0)))
-                .atPosition(0);
-        appCompatTextView3.perform(click());
+                                allOf(withId(R.id.filter_bar),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.RelativeLayout")),
+                                                1)),
+                                1),
+                        isDisplayed()));
+        appCompatButton3.perform(click());
+
+        ViewInteraction appCompatButton4 = onView(
+                allOf(withId(R.id.filter_glass_btn), withText("Glass"),
+                        childAtPosition(
+                                allOf(withId(R.id.filter_bar),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.RelativeLayout")),
+                                                1)),
+                                2),
+                        isDisplayed()));
+        appCompatButton4.perform(click());
     }
 
     private static Matcher<View> childAtPosition(
