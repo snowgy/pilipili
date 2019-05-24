@@ -21,11 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.*;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.example.pilipili.service.UploadService;
@@ -169,6 +165,20 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 .initialise();
         bottomNavigationBar.setTabSelectedListener(this);
         grid = (GridView) findViewById(R.id.grid_layout);
+        LinearLayout styleScroll = findViewById(R.id.style_scroll);
+        for (int i = 0; i < 25; ++i) {
+            ImageSlider styleSlider = new ImageSlider(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+            params.setMargins(10, 0, 10, 0);
+            params.height = params.width = 150;
+            styleSlider.setLayoutParams(params);
+            styleSlider.setImageBitmap(
+                    getBitmapFromAsset(CameraActivity.this, "thumbnails/style" + i + ".jpg"));
+            styleScroll.addView(styleSlider);
+        }
+        styleScroll.setOnTouchListener(gridTouchAdapter);
         grid.setAdapter(imageGridAdapter);
         grid.setOnTouchListener(gridTouchAdapter);
         setStyle(imageGridAdapter.items[0], 1.0f);

@@ -83,10 +83,19 @@
             android:textSize="16sp" />
     </LinearLayout>
 
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
+                          android:layout_below="@id/remove_backgroud_bar"
+                          android:id="@+id/style_scroll_view">
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                      android:id="@+id/style_scroll"
+                      android:orientation="horizontal">
+        </LinearLayout>
+    </HorizontalScrollView>
+
     <GridView
         android:id="@+id/grid_layout"
         android:numColumns="6"
-        android:layout_below="@+id/remove_backgroud_bar"
+        android:layout_below="@+id/style_scroll_view"
         android:stretchMode="columnWidth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
