@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class CameraTest {
+public class LikeTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
@@ -46,7 +46,7 @@ public class CameraTest {
                     "android.permission.WRITE_EXTERNAL_STORAGE");
 
     @Test
-    public void cameraTest() {
+    public void filterTest() {
         ViewInteraction appCompatEditText = onView(
                 allOf(withId(R.id.user_name),
                         childAtPosition(
@@ -100,6 +100,39 @@ public class CameraTest {
                                 0)))
                 .atPosition(0);
         appCompatTextView.perform(click());
+
+        ViewInteraction appCompatButton2 = onView(
+                allOf(withId(R.id.filter_grey_btn), withText("Grey"),
+                        childAtPosition(
+                                allOf(withId(R.id.filter_bar),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.RelativeLayout")),
+                                                1)),
+                                0),
+                        isDisplayed()));
+        appCompatButton2.perform(click());
+
+        ViewInteraction appCompatButton3 = onView(
+                allOf(withId(R.id.filter_sketch_btn), withText("Sketch"),
+                        childAtPosition(
+                                allOf(withId(R.id.filter_bar),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.RelativeLayout")),
+                                                1)),
+                                1),
+                        isDisplayed()));
+        appCompatButton3.perform(click());
+
+        ViewInteraction appCompatButton4 = onView(
+                allOf(withId(R.id.filter_glass_btn), withText("Glass"),
+                        childAtPosition(
+                                allOf(withId(R.id.filter_bar),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.RelativeLayout")),
+                                                1)),
+                                2),
+                        isDisplayed()));
+        appCompatButton4.perform(click());
     }
 
     private static Matcher<View> childAtPosition(

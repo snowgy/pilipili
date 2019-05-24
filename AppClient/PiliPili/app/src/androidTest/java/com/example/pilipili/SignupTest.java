@@ -32,58 +32,10 @@ import static org.hamcrest.Matchers.is;
 public class SignupTest {
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
-    /* Failed signup with user exist. */
-    @Test
-    public void SignUpTest0() {
-        ViewInteraction appCompatTextView = onView(
-                allOf(withId(R.id.link_signup), withText("No account yet? Create one"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                4)));
-        appCompatTextView.perform(scrollTo(), click());
-
-        ViewInteraction appCompatEditText = onView(
-                allOf(withId(R.id.user_name),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.support.design.widget.TextInputLayout")),
-                                        0),
-                                0)));
-        appCompatEditText.perform(scrollTo(), replaceText("zhouying"), closeSoftKeyboard());
-
-        ViewInteraction appCompatEditText2 = onView(
-                allOf(withId(R.id.input_password),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.support.design.widget.TextInputLayout")),
-                                        0),
-                                0)));
-        appCompatEditText2.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
-
-        ViewInteraction appCompatEditText3 = onView(
-                allOf(withId(R.id.input_reEnterPassword),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.support.design.widget.TextInputLayout")),
-                                        0),
-                                0)));
-        appCompatEditText3.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
-
-        ViewInteraction appCompatButton = onView(
-                allOf(withId(R.id.btn_signup), withText("Create Account"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                4)));
-        appCompatButton.perform(scrollTo(), click());
-    }
 
     /* Failed signup with error re-enter */
     @Test
-    public void SignUpTest1() {
+    public void SignUpTest0() {
         ViewInteraction appCompatTextView = onView(
                 allOf(withId(R.id.link_signup), withText("No account yet? Create one"),
                         childAtPosition(
@@ -133,7 +85,7 @@ public class SignupTest {
 
     /* Failed signup with invalid passwd input. */
     @Test
-    public void SignUpTest2() {
+    public void SignUpTest1() {
         ViewInteraction appCompatTextView = onView(
                 allOf(withId(R.id.link_signup), withText("No account yet? Create one"),
                         childAtPosition(
@@ -188,7 +140,7 @@ public class SignupTest {
                                         0),
                                 0)));
         /* passwd text length larger than 10. */
-        appCompatEditText4.perform(scrollTo(), replaceText("0123456789"), closeSoftKeyboard());
+        appCompatEditText4.perform(scrollTo(), replaceText("012345678910"), closeSoftKeyboard());
 
         ViewInteraction appCompatEditText5 = onView(
                 allOf(withId(R.id.input_reEnterPassword),
@@ -197,7 +149,7 @@ public class SignupTest {
                                         withClassName(is("android.support.design.widget.TextInputLayout")),
                                         0),
                                 0)));
-        appCompatEditText5.perform(scrollTo(), replaceText("0123456789"), closeSoftKeyboard());
+        appCompatEditText5.perform(scrollTo(), replaceText("012345678910"), closeSoftKeyboard());
 
         ViewInteraction appCompatButton1 = onView(
                 allOf(withId(R.id.btn_signup), withText("Create Account"),
@@ -209,6 +161,153 @@ public class SignupTest {
         appCompatButton.perform(scrollTo(), click());
     }
 
+    /* Failed signup with user exist. */
+    @Test
+    public void SignUpTest2() {
+        ViewInteraction appCompatTextView = onView(
+                allOf(withId(R.id.link_signup), withText("No account yet? Create one"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.ScrollView")),
+                                        0),
+                                4)));
+        appCompatTextView.perform(scrollTo(), click());
+
+        ViewInteraction appCompatEditText = onView(
+                allOf(withId(R.id.user_name),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.design.widget.TextInputLayout")),
+                                        0),
+                                0)));
+        appCompatEditText.perform(scrollTo(), replaceText("zhouying"), closeSoftKeyboard());
+
+        ViewInteraction appCompatEditText2 = onView(
+                allOf(withId(R.id.input_password),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.design.widget.TextInputLayout")),
+                                        0),
+                                0)));
+        appCompatEditText2.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
+
+        ViewInteraction appCompatEditText3 = onView(
+                allOf(withId(R.id.input_reEnterPassword),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.design.widget.TextInputLayout")),
+                                        0),
+                                0)));
+        appCompatEditText3.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
+
+        ViewInteraction appCompatButton = onView(
+                allOf(withId(R.id.btn_signup), withText("Create Account"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.ScrollView")),
+                                        0),
+                                4)));
+        appCompatButton.perform(scrollTo(), click());
+    }
+
+
+    /* Failed signup with name value is invalid. */
+    @Test
+    public void SignUpTest3() {
+        ViewInteraction appCompatTextView = onView(
+                allOf(withId(R.id.link_signup), withText("No account yet? Create one"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.ScrollView")),
+                                        0),
+                                4)));
+        appCompatTextView.perform(scrollTo(), click());
+
+        ViewInteraction appCompatEditText = onView(
+                allOf(withId(R.id.user_name),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.design.widget.TextInputLayout")),
+                                        0),
+                                0)));
+        appCompatEditText.perform(scrollTo(), replaceText("zh"), closeSoftKeyboard());
+
+        ViewInteraction appCompatEditText2 = onView(
+                allOf(withId(R.id.input_password),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.design.widget.TextInputLayout")),
+                                        0),
+                                0)));
+        appCompatEditText2.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
+
+        ViewInteraction appCompatEditText3 = onView(
+                allOf(withId(R.id.input_reEnterPassword),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.design.widget.TextInputLayout")),
+                                        0),
+                                0)));
+        appCompatEditText3.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
+
+        ViewInteraction appCompatButton = onView(
+                allOf(withId(R.id.btn_signup), withText("Create Account"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.ScrollView")),
+                                        0),
+                                4)));
+        appCompatButton.perform(scrollTo(), click());
+    }
+
+    /* Failed signup with name value is invalid. */
+    @Test
+    public void SignUpTest4() {
+        ViewInteraction appCompatTextView = onView(
+                allOf(withId(R.id.link_signup), withText("No account yet? Create one"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.ScrollView")),
+                                        0),
+                                4)));
+        appCompatTextView.perform(scrollTo(), click());
+
+        ViewInteraction appCompatEditText = onView(
+                allOf(withId(R.id.user_name),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.design.widget.TextInputLayout")),
+                                        0),
+                                0)));
+        appCompatEditText.perform(scrollTo(), replaceText("test001"), closeSoftKeyboard());
+
+        ViewInteraction appCompatEditText2 = onView(
+                allOf(withId(R.id.input_password),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.design.widget.TextInputLayout")),
+                                        0),
+                                0)));
+        appCompatEditText2.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
+
+        ViewInteraction appCompatEditText3 = onView(
+                allOf(withId(R.id.input_reEnterPassword),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.design.widget.TextInputLayout")),
+                                        0),
+                                0)));
+        appCompatEditText3.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
+
+        ViewInteraction appCompatButton = onView(
+                allOf(withId(R.id.btn_signup), withText("Create Account"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.ScrollView")),
+                                        0),
+                                4)));
+        appCompatButton.perform(scrollTo(), click());
+    }
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {
