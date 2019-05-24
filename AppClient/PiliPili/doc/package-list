@@ -1,6 +1,4 @@
-com.example.pilipili.api
-com.example.pilipili.config
+com.example.pilipili
 com.example.pilipili.model
 com.example.pilipili.service
-com.example.pilipili.service.auth
-com.example.pilipili.web
+com.example.pilipili.utils
