@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.example.pilipili.GridItemActivity;
 import com.example.pilipili.R;
 import com.example.pilipili.model.Image;
+import com.example.pilipili.utils.Data;
 import com.example.pilipili.utils.Session;
 import com.google.gson.Gson;
 
@@ -36,11 +37,12 @@ public class ImageService extends GeneralService{
 //    private List<Long> imageIds = new ArrayList<>();
 //    private List<String> images = new ArrayList<>();
 //    private List<Integer> likes = new ArrayList<>();
-    private List<Image> allImages = new ArrayList<>();
-    private List<Image> userImages = new ArrayList<>();
-    private List<Image> favoImages = new ArrayList<>();
+    public List<Image> allImages = new ArrayList<>();
+    public List<Image> userImages = new ArrayList<>();
+    public List<Image> favoImages = new ArrayList<>();
 
-    String imgBaseURL = "http://10.20.48.113:8080/api/file/";
+    // String imgBaseURL = "http://10.20.48.113:8080/api/file/";
+    String imgBaseURL = Data.imgBaseUrl;
     CustomAdapter adapter;
     GridView myGridView;
 
@@ -63,6 +65,7 @@ public class ImageService extends GeneralService{
                 /**
                  * set image view on the main page
                  */
+                allImages.clear();
 
                 if (response.body() != null){
                     for(Image img : response.body()) {
@@ -123,6 +126,7 @@ public class ImageService extends GeneralService{
         req.enqueue(new Callback<List<Image>>() {
             @Override
             public void onResponse(Call<List<Image>> call, Response<List<Image>> response) {
+                userImages.clear();
                 if (response.body() != null){
                     for(Image img : response.body()) {
                         userImages.add(img);
@@ -161,6 +165,7 @@ public class ImageService extends GeneralService{
         req.enqueue(new Callback<List<Image>>() {
             @Override
             public void onResponse(Call<List<Image>> call, Response<List<Image>> response) {
+                favoImages.clear();
                 if (response.body() != null){
                     for(Image img : response.body()) {
                         favoImages.add(img);

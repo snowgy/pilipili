@@ -58,6 +58,5 @@ dependencies {
     implementation 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
     implementation 'org.tensorflow:tensorflow-android:1.2.0-preview'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-    // implementation 'com.github.gabrielbb:cutout:0.1.2'
 }
 
