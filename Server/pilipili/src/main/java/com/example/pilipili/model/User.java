@@ -33,7 +33,7 @@ public class User {
     @Column(name="password")
     private String password;
 
-    @JsonBackReference
+    @JsonBackReference(value = "user-own-image")
     @OneToMany(
             mappedBy = "owner",
             cascade = CascadeType.ALL,
@@ -41,7 +41,7 @@ public class User {
     )
     private List<Image> imageList = new ArrayList<>();
 
-    @JsonBackReference
+    @JsonBackReference(value = "user-love-image")
     @ManyToMany(cascade = {
             CascadeType.PERSIST,
             CascadeType.MERGE,
@@ -62,6 +62,13 @@ public class User {
         lovedImages.remove(img);
         img.getLovers().remove(this);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        User user = (User) obj;
+        return this.userId == user.userId;
+    }
+
 
 
 

@@ -1,7 +1,9 @@
 package com.example.pilipili.service;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.pilipili.GridItemActivity;
+import com.example.pilipili.MainActivity;
 import com.example.pilipili.R;
 import com.example.pilipili.model.Image;
 import com.example.pilipili.utils.Data;
@@ -34,14 +37,10 @@ import retrofit2.Response;
 
 public class ImageService extends GeneralService{
 
-//    private List<Long> imageIds = new ArrayList<>();
-//    private List<String> images = new ArrayList<>();
-//    private List<Integer> likes = new ArrayList<>();
     public List<Image> allImages = new ArrayList<>();
     public List<Image> userImages = new ArrayList<>();
     public List<Image> favoImages = new ArrayList<>();
 
-    // String imgBaseURL = "http://10.20.48.113:8080/api/file/";
     String imgBaseURL = Data.imgBaseUrl;
     CustomAdapter adapter;
     GridView myGridView;
@@ -82,6 +81,7 @@ public class ImageService extends GeneralService{
                             intent.putExtra("imageId", image.getId());
                             intent.putExtra("likeNum", image.getLikeNum());
                             intent.putExtra("image", imgBaseURL + image.getPath());
+                            intent.putExtra("userName", image.getUserName());
                             mainContext.startActivity(intent);
                         }
                     });
@@ -117,7 +117,7 @@ public class ImageService extends GeneralService{
 
     }
 
-    public void getUserImages(Activity activity, GridView gridView){
+    public void getUserImages(final Activity activity, GridView gridView){
         Call<List<Image>> req = service.getUserImages(Session.userName);
         final Context mainContext = activity.getBaseContext();
         adapter = new CustomAdapter(activity, userImages);
@@ -131,7 +131,22 @@ public class ImageService extends GeneralService{
                     for(Image img : response.body()) {
                         userImages.add(img);
                     }
+                    if (userImages.size() == 0) {
+                        new AlertDialog.Builder(activity)
+                                .setTitle("You have no photo now")
+                                .setItems(new String[]{"Go to upload"}, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        if (i == 0) {
+                                            Intent intent = new Intent(activity.getBaseContext(), MainActivity.class);
+                                            activity.startActivity(intent);
+                                        }
+                                    }
+                                })
+                                .create()
+                                .show();
 
+                    }
                     myGridView.setAdapter(adapter);
 
                     myGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -142,6 +157,7 @@ public class ImageService extends GeneralService{
                             intent.putExtra("imageId", image.getId());
                             intent.putExtra("likeNum", image.getLikeNum());
                             intent.putExtra("image", imgBaseURL + image.getPath());
+                            intent.putExtra("userName", image.getUserName());
                             mainContext.startActivity(intent);
                         }
                     });
@@ -156,7 +172,7 @@ public class ImageService extends GeneralService{
         });
     }
 
-    public void getLovedImages(Activity activity, GridView gridView){
+    public void getLovedImages(final Activity activity, GridView gridView){
         Call<List<Image>> req = service.getLovedImages(Session.userName);
         final Context mainContext = activity.getBaseContext();
         adapter = new CustomAdapter(activity, favoImages);
@@ -171,6 +187,23 @@ public class ImageService extends GeneralService{
                         favoImages.add(img);
                     }
 
+                    if (favoImages.size() == 0) {
+                        new AlertDialog.Builder(activity)
+                                .setTitle("No Loving Photo now")
+                                .setItems(new String[]{"Explore more"}, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        if (i == 0) {
+                                            Intent intent = new Intent(activity.getBaseContext(), MainActivity.class);
+                                            activity.startActivity(intent);
+                                        }
+                                    }
+                                })
+                                .create()
+                                .show();
+
+                    }
+
                     myGridView.setAdapter(adapter);
 
                     myGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -181,15 +214,33 @@ public class ImageService extends GeneralService{
                             intent.putExtra("imageId", image.getId());
                             intent.putExtra("likeNum", image.getLikeNum());
                             intent.putExtra("image", imgBaseURL + image.getPath());
+                            intent.putExtra("userName", image.getUserName());
                             mainContext.startActivity(intent);
                         }
                     });
+
+
 
                 }
             }
 
             @Override
             public void onFailure(Call<List<Image>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public void deleteImage(final Context context, long imgId){
+        Call<ResponseBody> req = service.deleteImage(imgId);
+        req.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Toast.makeText(context, "delete successfully", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
 
             }
         });

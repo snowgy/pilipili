@@ -112,6 +112,13 @@ public class UserControllerTest {
 
     }
 
-    
+    @Test
+    public void testGetUserImage() throws Exception {
+        mvc.perform(post("/getUserImages")
+                    .param("userName", "root")
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk());
+    }
 
 }

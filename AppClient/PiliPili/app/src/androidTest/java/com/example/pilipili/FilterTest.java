@@ -104,7 +104,7 @@ public class FilterTest {
         ViewInteraction appCompatButton2 = onView(
                 allOf(withId(R.id.filter_grey_btn), withText("Grey"),
                         childAtPosition(
-                                allOf(withId(R.id.filter_bar),
+                                allOf(withId(R.id.filter_bar_1),
                                         childAtPosition(
                                                 withClassName(is("android.widget.RelativeLayout")),
                                                 1)),
@@ -115,7 +115,7 @@ public class FilterTest {
         ViewInteraction appCompatButton3 = onView(
                 allOf(withId(R.id.filter_sketch_btn), withText("Sketch"),
                         childAtPosition(
-                                allOf(withId(R.id.filter_bar),
+                                allOf(withId(R.id.filter_bar_1),
                                         childAtPosition(
                                                 withClassName(is("android.widget.RelativeLayout")),
                                                 1)),
@@ -126,7 +126,7 @@ public class FilterTest {
         ViewInteraction appCompatButton4 = onView(
                 allOf(withId(R.id.filter_glass_btn), withText("Glass"),
                         childAtPosition(
-                                allOf(withId(R.id.filter_bar),
+                                allOf(withId(R.id.filter_bar_1),
                                         childAtPosition(
                                                 withClassName(is("android.widget.RelativeLayout")),
                                                 1)),

@@ -12,4 +12,5 @@ public interface ImageService {
     Image getImageById(long id);
     void save(Image image);
     void lovePhoto(long imgId);
+    void deletePhoto(long imgId);
 }

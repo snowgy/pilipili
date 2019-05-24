@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
     GridView gridView;
 
     public static final int SELECT_PHOTO_CODE = 2;
+    public static int HOME = 1;
     public ImageService imageService;
 
     @Override
@@ -59,10 +60,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
     public void onTabSelected(int position) {
         switch (position) {
             case 0:
-                Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                startActivity(intent);
+                if (HOME != 1){
+                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                    startActivity(intent);
+                    HOME = 1;
+                }
                 break;
             case 1:
+                HOME = 0;
                 final Activity context = this;
                 if (! cameraPermission()) {
                     ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, SELECT_PHOTO_CODE);
@@ -87,9 +92,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                         .show();
                 break;
             case 2:
+                HOME = 0;
                 imageService.getLovedImages(MainActivity.this, gridView);
                 break;
             case 3:
+                HOME = 0;
                 imageService.getUserImages(MainActivity.this, gridView);
                 break;
             case 4:
@@ -99,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 if (i == 0) {
+                                    HOME = 0;
                                     Session.clear();    // clear the userSession
                                     Intent intent = new Intent(getBaseContext(), MainActivity.class);
                                     startActivity(intent);

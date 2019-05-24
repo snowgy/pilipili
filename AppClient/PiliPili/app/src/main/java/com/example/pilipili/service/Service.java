@@ -38,4 +38,8 @@ public interface Service {
     @POST("/updateLikeNum")
     Call<ResponseBody> updateLikeNum(@Body RequestBody body);
 
+    @FormUrlEncoded
+    @POST("/deleteImage")
+    Call<ResponseBody> deleteImage(@Field("imgId") long imgId);
+
 }
