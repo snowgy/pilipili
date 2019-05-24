@@ -57,8 +57,8 @@ public class ImageServiceImpl implements ImageService {
     }
 
     /**
-     * 
-     * @param imgId
+     * delete one photo
+     * @param imgId image id
      */
     @Override
     public void deletePhoto(long imgId) {

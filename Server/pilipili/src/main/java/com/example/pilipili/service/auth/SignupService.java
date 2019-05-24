@@ -4,7 +4,6 @@ package com.example.pilipili.service.auth;
 import com.example.pilipili.api.UserRepository;
 import com.example.pilipili.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service

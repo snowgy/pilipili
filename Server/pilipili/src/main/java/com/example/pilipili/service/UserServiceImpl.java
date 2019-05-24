@@ -59,6 +59,11 @@ public class UserServiceImpl implements UserService {
         return paths;
     }
 
+    /**
+     * user love one photo
+     * @param user user
+     * @param image image
+     */
     @Override
     public void addLovePhoto(User user, Image image) {
         user.addLoveImage(image);
@@ -69,23 +74,4 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-//    @Override
-//    public User getUserById(long id) {
-//        return userRepository.findUserByUserId(id);
-//    }
-//
-//    @Override
-//    public void save(User user) {
-//        userRepository.save(user);
-//    }
-//
-//    @Override
-//    public void deleteUserByID(long id) {
-//        userRepository.deleteUserByUserId(id);
-//    }
-//
-//    @Override
-//    public void deleteUserByUsername(String userName) {
-//        userRepository.deleteUserByUserName(userName);
-//    }
 }

@@ -96,6 +96,12 @@ public class ImageService extends GeneralService{
         });
     }
 
+    /**
+     * update photo like number
+     * @param userName userName
+     * @param imgId image id
+     * @param likeNum current like number
+     */
     public void updateLikeNum(String userName, long imgId, int likeNum){
         Map<String, Object> params = new LinkedHashMap<>();
         params.put("userName", userName);
@@ -117,6 +123,11 @@ public class ImageService extends GeneralService{
 
     }
 
+    /**
+     * get images belong to one user.
+     * @param activity activity
+     * @param gridView gridview to be updated
+     */
     public void getUserImages(final Activity activity, GridView gridView){
         Call<List<Image>> req = service.getUserImages(Session.userName);
         final Context mainContext = activity.getBaseContext();
@@ -172,6 +183,11 @@ public class ImageService extends GeneralService{
         });
     }
 
+    /**
+     * get images one user loved
+     * @param activity activity
+     * @param gridView gridview to be updated
+     */
     public void getLovedImages(final Activity activity, GridView gridView){
         Call<List<Image>> req = service.getLovedImages(Session.userName);
         final Context mainContext = activity.getBaseContext();
@@ -231,6 +247,11 @@ public class ImageService extends GeneralService{
         });
     }
 
+    /**
+     * delete one photo
+     * @param context context
+     * @param imgId image id
+     */
     public void deleteImage(final Context context, long imgId){
         Call<ResponseBody> req = service.deleteImage(imgId);
         req.enqueue(new Callback<ResponseBody>() {

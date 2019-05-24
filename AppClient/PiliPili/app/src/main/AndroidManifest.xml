@@ -27,7 +27,6 @@
         <activity android:name="com.example.pilipili.LoginActivity" android:theme="@style/Theme.AppCompat.DayNight" />
         <activity android:name="com.example.pilipili.SignupActivity" android:theme="@style/Theme.AppCompat.DayNight" />
         <activity android:name="com.example.pilipili.GridItemActivity" android:theme="@style/Theme.AppCompat.DayNight"/>
-        <activity android:name="com.example.pilipili.GalleryActivity" android:theme="@style/Theme.AppCompat.DayNight"/>
         <activity android:name="com.example.pilipili.CameraActivity" android:theme="@style/Theme.AppCompat.DayNight" />
 
         <provider
