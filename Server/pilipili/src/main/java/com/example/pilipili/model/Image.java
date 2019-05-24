@@ -27,13 +27,13 @@ public class Image {
     @Column(name="like_num")
     private int likeNum;
 
-    @JsonBackReference
+    @JsonBackReference(value = "user-own-image")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", nullable = false)
     private User owner;
 
 
-    @JsonBackReference
+    @JsonBackReference(value = "user-love-image")
     @ManyToMany(mappedBy = "lovedImages")
     private Set<User> lovers = new HashSet<>();
 
@@ -46,14 +46,13 @@ public class Image {
         lovers.remove(user);
         user.getLovedImages().remove(this);
     }
+
     @Override
-    public boolean equals(Object o){
-        if(this == o)
-            return true;
-        if(!(o instanceof Image))
-            return false;
-        return imageId!=null && this.equals((Image)o);
+    public boolean equals(Object obj) {
+        Image user = (Image) obj;
+        return this.imageId == user.imageId;
     }
+
 
     public Set<User> getLovers() {
         return lovers;

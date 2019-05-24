@@ -34,14 +34,10 @@ import retrofit2.Response;
 
 public class ImageService extends GeneralService{
 
-//    private List<Long> imageIds = new ArrayList<>();
-//    private List<String> images = new ArrayList<>();
-//    private List<Integer> likes = new ArrayList<>();
     public List<Image> allImages = new ArrayList<>();
     public List<Image> userImages = new ArrayList<>();
     public List<Image> favoImages = new ArrayList<>();
 
-    // String imgBaseURL = "http://10.20.48.113:8080/api/file/";
     String imgBaseURL = Data.imgBaseUrl;
     CustomAdapter adapter;
     GridView myGridView;
@@ -82,6 +78,7 @@ public class ImageService extends GeneralService{
                             intent.putExtra("imageId", image.getId());
                             intent.putExtra("likeNum", image.getLikeNum());
                             intent.putExtra("image", imgBaseURL + image.getPath());
+                            intent.putExtra("userName", image.getUserName());
                             mainContext.startActivity(intent);
                         }
                     });
@@ -142,6 +139,7 @@ public class ImageService extends GeneralService{
                             intent.putExtra("imageId", image.getId());
                             intent.putExtra("likeNum", image.getLikeNum());
                             intent.putExtra("image", imgBaseURL + image.getPath());
+                            intent.putExtra("userName", image.getUserName());
                             mainContext.startActivity(intent);
                         }
                     });
@@ -181,6 +179,7 @@ public class ImageService extends GeneralService{
                             intent.putExtra("imageId", image.getId());
                             intent.putExtra("likeNum", image.getLikeNum());
                             intent.putExtra("image", imgBaseURL + image.getPath());
+                            intent.putExtra("userName", image.getUserName());
                             mainContext.startActivity(intent);
                         }
                     });
@@ -190,6 +189,21 @@ public class ImageService extends GeneralService{
 
             @Override
             public void onFailure(Call<List<Image>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public void deleteImage(final Context context, long imgId){
+        Call<ResponseBody> req = service.deleteImage(imgId);
+        req.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Toast.makeText(context, "delete successfully", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
 
             }
         });

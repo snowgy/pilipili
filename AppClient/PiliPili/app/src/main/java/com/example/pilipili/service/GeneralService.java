@@ -8,7 +8,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GeneralService {
-    // public static String baseURL = "http://10.20.48.113:8080";
     public String baseURL = Data.baseUrl;
     public HttpLoggingInterceptor interceptor;
     public OkHttpClient client;
@@ -22,9 +21,5 @@ public class GeneralService {
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client).build()
                 .create(Service.class);
-    }
-
-    public Service getService(){
-        return service;
     }
 }

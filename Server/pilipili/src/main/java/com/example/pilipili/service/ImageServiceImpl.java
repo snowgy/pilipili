@@ -2,12 +2,16 @@ package com.example.pilipili.service;
 
 import com.example.pilipili.api.ImageRepository;
 import com.example.pilipili.model.Image;
+import com.example.pilipili.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 
 @Service
+@Transactional
 public class ImageServiceImpl implements ImageService {
     @Autowired
     ImageRepository imageRepository;
@@ -41,5 +45,15 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public void lovePhoto(long imgId) {
 
+    }
+
+    @Override
+    public void deletePhoto(long imgId) {
+        Image img = imageRepository.findImageByImageId(imgId);
+        Set<User> users = img.getLovers();
+        for(User user: users){
+            user.removeLoveImage(img);
+        }
+        imageRepository.delete(img);
     }
 }

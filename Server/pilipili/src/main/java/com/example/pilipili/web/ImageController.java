@@ -37,6 +37,10 @@ public class ImageController {
         return imageDataList;
     }
 
+    @PostMapping(value = {"/deleteImage"})
+    public void deletImage(@RequestParam("imgId") long imgId) {
+        imageService.deletePhoto(imgId);
+    }
     @PostMapping(value = {"/getLikeNumber"})
     public int getLikeNumber(@RequestParam("path") String imagePath) {
         return imageService.getImageLikes(imagePath);
