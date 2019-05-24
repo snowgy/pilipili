@@ -11,7 +11,6 @@ public class LoginService {
     @Autowired
     private UserRepository userRepository;
 
-    private User user;
 
     /**
      * verify whether the user can login successfully or not.
@@ -30,8 +29,5 @@ public class LoginService {
         return passwordAuthentication.authenticate(password.toCharArray(), token);
     }
 
-    public void setUser(User user){
-        this.user = user;
-    }
 
 }

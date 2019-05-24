@@ -3,7 +3,7 @@ package com.example.pilipili.model;
 /**
  * image model for data transfer
  */
-public class ImageData {
+public final class ImageData {
     Long id;
     String path;
     int likeNum;

@@ -61,10 +61,10 @@ public class GridItemActivity extends AppCompatActivity {
                     case 1:
                         like.setText(String.valueOf(++likeNum));
                         ImageService imageService = new ImageService();
-                        imageService.updateLikeNum(Session.userName, imgId, likeNum);
+                        imageService.updateLikeNum(Session.getUserName(), imgId, likeNum);
                         break;
                     case 2:
-                        if(userName.equals(Session.userName)){
+                        if(userName.equals(Session.getUserName())){
                             new AlertDialog.Builder(activity)
                                     .setTitle("Sure to delete?")
                                     .setItems(new String[]{"Yes", "Cancel"}, new DialogInterface.OnClickListener() {
@@ -103,10 +103,10 @@ public class GridItemActivity extends AppCompatActivity {
                     case 1:
                         like.setText(String.valueOf(++likeNum));
                         ImageService imageService = new ImageService();
-                        imageService.updateLikeNum(Session.userName, imgId, likeNum);
+                        imageService.updateLikeNum(Session.getUserName(), imgId, likeNum);
                         break;
                     case 2:
-                        if(userName.equals(Session.userName)){
+                        if(userName.equals(Session.getUserName())){
                             new AlertDialog.Builder(activity)
                                     .setTitle("Sure to delete?")
                                     .setItems(new String[]{"Yes", "Cancel"}, new DialogInterface.OnClickListener() {

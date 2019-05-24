@@ -129,7 +129,7 @@ public class ImageService extends GeneralService{
      * @param gridView gridview to be updated
      */
     public void getUserImages(final Activity activity, GridView gridView){
-        Call<List<Image>> req = service.getUserImages(Session.userName);
+        Call<List<Image>> req = service.getUserImages(Session.getUserName());
         final Context mainContext = activity.getBaseContext();
         adapter = new CustomAdapter(activity, userImages);
         myGridView = gridView;
@@ -189,7 +189,7 @@ public class ImageService extends GeneralService{
      * @param gridView gridview to be updated
      */
     public void getLovedImages(final Activity activity, GridView gridView){
-        Call<List<Image>> req = service.getLovedImages(Session.userName);
+        Call<List<Image>> req = service.getLovedImages(Session.getUserName());
         final Context mainContext = activity.getBaseContext();
         adapter = new CustomAdapter(activity, favoImages);
         myGridView = gridView;

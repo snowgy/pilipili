@@ -30,7 +30,7 @@ public class UploadService extends GeneralService {
     public void upload(final Activity activity, File file) {
         RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), reqFile);
-        RequestBody userName = RequestBody.create(MediaType.parse("multipart/form-data"), Session.userName);
+        RequestBody userName = RequestBody.create(MediaType.parse("multipart/form-data"), Session.getUserName());
 
         retrofit2.Call<okhttp3.ResponseBody> req = service.uploadImg(body, userName);
         req.enqueue(new Callback<ResponseBody>() {

@@ -121,8 +121,7 @@ public final class UserController {
     public List<ImageData> getUserImages(@RequestParam String userName) {
         User user = userService.getUserByName(userName);
         List<Image> images = user.getImageList();
-        List<ImageData> imageDataList = fillImageList(images);
-        return imageDataList;
+        return fillImageList(images);
     }
 
     /**
@@ -134,8 +133,7 @@ public final class UserController {
     public List<ImageData> getLovedImages(@RequestParam String userName) {
         User user = userService.getUserByName(userName);
         Set<Image> lovedImages = user.getLovedImages();
-        List<ImageData> imageDataList = fillImageList(lovedImages);
-        return imageDataList;
+        return fillImageList(lovedImages);
     }
 
 
