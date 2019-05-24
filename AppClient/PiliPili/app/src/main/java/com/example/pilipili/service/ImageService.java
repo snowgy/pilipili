@@ -63,6 +63,7 @@ public class ImageService extends GeneralService{
                 /**
                  * set image view on the main page
                  */
+                allImages.clear();
 
                 if (response.body() != null){
                     for(Image img : response.body()) {
@@ -123,6 +124,7 @@ public class ImageService extends GeneralService{
         req.enqueue(new Callback<List<Image>>() {
             @Override
             public void onResponse(Call<List<Image>> call, Response<List<Image>> response) {
+                userImages.clear();
                 if (response.body() != null){
                     for(Image img : response.body()) {
                         userImages.add(img);
@@ -161,6 +163,7 @@ public class ImageService extends GeneralService{
         req.enqueue(new Callback<List<Image>>() {
             @Override
             public void onResponse(Call<List<Image>> call, Response<List<Image>> response) {
+                favoImages.clear();
                 if (response.body() != null){
                     for(Image img : response.body()) {
                         favoImages.add(img);
