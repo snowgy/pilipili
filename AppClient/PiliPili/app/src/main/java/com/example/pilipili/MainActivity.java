@@ -179,6 +179,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
                         .show();
 
                 break;
+            default:
+                break;
         }
 
     }

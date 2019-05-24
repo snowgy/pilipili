@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
 /** Signup Activity */
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
-    private ProgressDialog progressDialog;
+    protected ProgressDialog progressDialog;
     private String globalUserName = "";
 
     private static String baseURL = Data.baseUrl;

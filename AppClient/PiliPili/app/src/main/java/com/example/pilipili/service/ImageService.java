@@ -37,9 +37,9 @@ public class ImageService extends GeneralService{
 //    private List<Long> imageIds = new ArrayList<>();
 //    private List<String> images = new ArrayList<>();
 //    private List<Integer> likes = new ArrayList<>();
-    private List<Image> allImages = new ArrayList<>();
-    private List<Image> userImages = new ArrayList<>();
-    private List<Image> favoImages = new ArrayList<>();
+    public List<Image> allImages = new ArrayList<>();
+    public List<Image> userImages = new ArrayList<>();
+    public List<Image> favoImages = new ArrayList<>();
 
     // String imgBaseURL = "http://10.20.48.113:8080/api/file/";
     String imgBaseURL = Data.imgBaseUrl;

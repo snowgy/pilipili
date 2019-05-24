@@ -57,6 +57,8 @@ public class GridItemActivity extends AppCompatActivity {
                         ImageService imageService = new ImageService();
                         imageService.updateLikeNum(Session.userName, imgId, likeNum);
                         break;
+                    default:
+                        break;
                 }
 
             }
@@ -77,6 +79,8 @@ public class GridItemActivity extends AppCompatActivity {
                         like.setText(String.valueOf(++likeNum));
                         ImageService imageService = new ImageService();
                         imageService.updateLikeNum(Session.userName, imgId, likeNum);
+                        break;
+                    default:
                         break;
                 }
 
