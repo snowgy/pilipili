@@ -1,5 +1,6 @@
 package com.example.pilipili;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,7 +11,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,13 +18,11 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
+import android.util.Log;
+import android.view.*;
 import android.widget.*;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
-import com.example.pilipili.model.Image;
 import com.example.pilipili.service.UploadService;
 import com.example.pilipili.utils.BitmapUtils;
 
@@ -35,25 +33,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jp.co.cyberagent.android.gpuimage.GPUImage;
-import jp.co.cyberagent.android.gpuimage.GPUImageBulgeDistortionFilter;
-import jp.co.cyberagent.android.gpuimage.GPUImageColorBurnBlendFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageDissolveBlendFilter;
-import jp.co.cyberagent.android.gpuimage.GPUImageEmbossFilter;
-import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageGlassSphereFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageGrayscaleFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageLightenBlendFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageOverlayBlendFilter;
-import jp.co.cyberagent.android.gpuimage.GPUImageScreenBlendFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageSketchFilter;
-import jp.co.cyberagent.android.gpuimage.GPUImageVignetteFilter;
 
 public class CameraActivity extends AppCompatActivity implements BottomNavigationBar.OnTabSelectedListener {
 
@@ -77,9 +69,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
 
     private final int dimFilter = 0x99000000;
     private int currentStyle = 0;
-
-    protected ImageGridAdapter imageGridAdapter;
-    protected GridView grid;
 
     private int[] intValues;
     private float[] floatValues;
@@ -129,7 +118,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         setContentView(R.layout.activity_edit);
         ButterKnife.bind(this);
         inferenceInterface = new TensorFlowInferenceInterface(getAssets(), MODEL_FILE);
-        imageGridAdapter = new ImageGridAdapter();
         BottomNavigationBar bottomNavigationBar = (BottomNavigationBar) findViewById(R.id.edit_nav_bar);
         bottomNavigationBar
                 .addItem(new BottomNavigationItem(R.mipmap.ic_outline_arrow_back_black_24dp, "back"))
@@ -170,6 +158,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     }
 
     private final ImageButton.OnClickListener styleButtonListener = view -> {
+        Log.d("EDIT", "styleValues: " + Arrays.toString(styleValues));
         ImageButton button = (ImageButton) view;
         SeekBar seekBar = findViewById(R.id.style_value_bar);
         for (int i = 0; i < NUM_STYLES; i++) {
@@ -197,8 +186,23 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-            setStyle(currentStyle, styleValues[currentStyle]);
-            stylizeImage(globalBitmap);
+            ProgressDialog myDialog = new ProgressDialog(CameraActivity.this);
+            myDialog.setTitle("Processing...");
+            myDialog.setMessage("Please wait.");
+            myDialog.setIndeterminate(true);
+            myDialog.show();
+            myDialog.setCancelable(false);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        setStyle(currentStyle, styleValues[currentStyle]);
+                        stylizeImage(globalBitmap);
+                    } catch (Exception ignored) { }
+                    myDialog.dismiss();
+                }
+            }).start();
         }
     };
 
@@ -218,7 +222,7 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 final float factor = otherSum > 0.0f ? (1.0f - value) / otherSum : 0.0f;
                 for (int i = 0; i < NUM_STYLES; ++i) {
                     if (i == idx)
-                        continue;;
+                        continue;
                     final float newVal = styleValues[i] * factor;
                     styleValues[i] = newVal > 0.01f ? newVal : 0.0f;
 
@@ -236,7 +240,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 styleValues[lastOtherStyle] = 1.0f - value;
             }
         }
-        final boolean lastAllZero = allZero;
         float sum = 0.0f;
         for (int i = 0; i < NUM_STYLES; ++i) {
             sum += styleValues[i];
@@ -246,9 +249,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         // equally. Otherwise everything is normalized to sum to 1.0.
         for (int i = 0; i < NUM_STYLES; ++i) {
             styleVals[i] = allZero ? 1.0f / NUM_STYLES : styleValues[i] / sum;
-//            if (lastAllZero != allZero) {
-//                imageGridAdapter.items[i].postInvalidate();
-//            }
         }
     }
 
@@ -532,48 +532,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
             this.postInvalidate();
         }
 
-    }
-
-    protected class ImageGridAdapter extends BaseAdapter {
-        protected final ImageSlider[] items = new ImageSlider[NUM_STYLES];
-        final ArrayList<Button> buttons = new ArrayList<>();
-        public ImageGridAdapter() {
-            for (int i = 0; i < NUM_STYLES; ++i) {
-                if (items[i] == null) {
-                    final ImageSlider slider = new ImageSlider(CameraActivity.this);
-                    final Bitmap bm =
-                            getBitmapFromAsset(CameraActivity.this, "thumbnails/style" + i + ".jpg");
-                    slider.setImageBitmap(bm);
-                    items[i] = slider;
-                }
-            }
-        }
-        @Override
-        public int getCount() {
-            return buttons.size() + NUM_STYLES;
-        }
-
-        @Override
-        public Object getItem(final int position) {
-            if (position < buttons.size()) {
-                return buttons.get(position);
-            } else {
-                return items[position - buttons.size()];
-            }
-        }
-
-        @Override
-        public long getItemId(final int position) {
-            return getItem(position).hashCode();
-        }
-
-        @Override
-        public View getView(final int position, final View convertView, final ViewGroup parent) {
-            if (convertView != null) {
-                return convertView;
-            }
-            return (View) getItem(position);
-        }
     }
 
     public static Bitmap getBitmapFromAsset(final Context context, final String filePath) {
