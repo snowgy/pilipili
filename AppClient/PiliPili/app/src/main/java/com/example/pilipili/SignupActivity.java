@@ -142,8 +142,8 @@ public class SignupActivity extends AppCompatActivity {
      * Specify the behavior when signup success
      */
     public void onSignupSuccess() {
-        Session.userName = globalUserName;
-        Session.isLogin = true;
+        Session.setUserName(globalUserName);
+        Session.setLogin(true);
         signupButton.setEnabled(true);
         setResult(RESULT_OK, null);
         finish();

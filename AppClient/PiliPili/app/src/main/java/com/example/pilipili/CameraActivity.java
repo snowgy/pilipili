@@ -196,10 +196,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        setStyle(currentStyle, styleValues[currentStyle]);
-                        stylizeImage(globalBitmap);
-                    } catch (Exception ignored) { }
+                    setStyle(currentStyle, styleValues[currentStyle]);
+                    stylizeImage(globalBitmap);
                     myDialog.dismiss();
                 }
             }).start();
