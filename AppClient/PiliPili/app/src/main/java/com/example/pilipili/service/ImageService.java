@@ -1,7 +1,9 @@
 package com.example.pilipili.service;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.pilipili.GridItemActivity;
+import com.example.pilipili.MainActivity;
 import com.example.pilipili.R;
 import com.example.pilipili.model.Image;
 import com.example.pilipili.utils.Data;
@@ -114,7 +117,7 @@ public class ImageService extends GeneralService{
 
     }
 
-    public void getUserImages(Activity activity, GridView gridView){
+    public void getUserImages(final Activity activity, GridView gridView){
         Call<List<Image>> req = service.getUserImages(Session.userName);
         final Context mainContext = activity.getBaseContext();
         adapter = new CustomAdapter(activity, userImages);
@@ -128,7 +131,22 @@ public class ImageService extends GeneralService{
                     for(Image img : response.body()) {
                         userImages.add(img);
                     }
+                    if (userImages.size() == 0) {
+                        new AlertDialog.Builder(activity)
+                                .setTitle("You have no photo now")
+                                .setItems(new String[]{"Go to upload"}, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        if (i == 0) {
+                                            Intent intent = new Intent(activity.getBaseContext(), MainActivity.class);
+                                            activity.startActivity(intent);
+                                        }
+                                    }
+                                })
+                                .create()
+                                .show();
 
+                    }
                     myGridView.setAdapter(adapter);
 
                     myGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -154,7 +172,7 @@ public class ImageService extends GeneralService{
         });
     }
 
-    public void getLovedImages(Activity activity, GridView gridView){
+    public void getLovedImages(final Activity activity, GridView gridView){
         Call<List<Image>> req = service.getLovedImages(Session.userName);
         final Context mainContext = activity.getBaseContext();
         adapter = new CustomAdapter(activity, favoImages);
@@ -167,6 +185,23 @@ public class ImageService extends GeneralService{
                 if (response.body() != null){
                     for(Image img : response.body()) {
                         favoImages.add(img);
+                    }
+
+                    if (favoImages.size() == 0) {
+                        new AlertDialog.Builder(activity)
+                                .setTitle("No Loving Photo now")
+                                .setItems(new String[]{"Explore more"}, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        if (i == 0) {
+                                            Intent intent = new Intent(activity.getBaseContext(), MainActivity.class);
+                                            activity.startActivity(intent);
+                                        }
+                                    }
+                                })
+                                .create()
+                                .show();
+
                     }
 
                     myGridView.setAdapter(adapter);
@@ -183,6 +218,8 @@ public class ImageService extends GeneralService{
                             mainContext.startActivity(intent);
                         }
                     });
+
+
 
                 }
             }

@@ -143,6 +143,7 @@ public class SignupActivity extends AppCompatActivity {
      */
     public void onSignupSuccess() {
         Session.userName = globalUserName;
+        Session.isLogin = true;
         signupButton.setEnabled(true);
         setResult(RESULT_OK, null);
         finish();
