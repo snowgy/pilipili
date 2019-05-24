@@ -85,12 +85,13 @@
 
     <GridView
         android:id="@+id/grid_layout"
-        android:numColumns="6"
+        android:numColumns="4"
         android:layout_below="@+id/remove_backgroud_bar"
+        android:layout_above="@+id/edit_nav_bar"
         android:stretchMode="columnWidth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:horizontalSpacing="2dp"

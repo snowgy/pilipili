@@ -29,6 +29,8 @@ import android.widget.Toast;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.example.pilipili.service.UploadService;
+import com.example.pilipili.utils.BitmapUtils;
+
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -79,8 +81,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
     private static final String STYLE_NODE = "style_num";
     private static final String OUTPUT_NODE = "transformer/expand/conv3/conv/Sigmoid";
 
-    private static final int NUM_STYLES = 18;
-    private static final int IGNORE_IMAGE_NUM = 8;
+    private static final int NUM_STYLES = 8;
+    private static final int IGNORE_IMAGE_NUM = 18;
     private final float[] styleVals = new float[NUM_STYLES + IGNORE_IMAGE_NUM];
 
     public static final int TAKE_PHOTO_CODE = 1;
@@ -381,18 +383,6 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         }
     }
 
-    public void cropPhoto(Uri imageUri) {
-        Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.setDataAndType(imageUri, "image/*");
-        intent.putExtra("crop", "true");
-        intent.putExtra("aspectX", 1);
-        intent.putExtra("aspectY", 1);
-        intent.putExtra("outputX", 260);
-        intent.putExtra("outputY", 260);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-        startActivityForResult(intent, CROP_PHOTO);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -406,7 +396,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                     Bitmap bitmap;
                     try{
                         bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), resultUri);
-                        setArgs(bitmap);
+                        Bitmap cropped = BitmapUtils.cropBitmapToSquare(bitmap);
+                        setArgs(cropped);
                         filterImage();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -423,7 +414,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                     Bitmap bitmap;
                     try {
                         bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                        setArgs(bitmap);
+                        Bitmap cropped = BitmapUtils.cropBitmapToSquare(bitmap);
+                        setArgs(cropped);
                         filterImage();
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
@@ -448,46 +440,14 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
 
                 }
         }
-//        if (requestCode == TAKE_PHOTO_CODE) {
-//            if (resultUri != null) {
-//                Bitmap bitmap;
-//                try {
-//                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), resultUri);
-//                    setArgs(bitmap);
-//                    filterImage();
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//        } else if (requestCode == SELECT_PHOTO_CODE) {
-//            File imageFile = createImageFile();
-//            if (imageFile == null)
-//                return;
-//            Uri imageUri = data.getData();
-//            if (imageUri != null) {
-//                Bitmap bitmap;
-//                try {
-//                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-//                    setArgs(bitmap);
-//                    filterImage();
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
     }
 
     private void setArgs(Bitmap bitmap) {
         editImageView.setImageBitmap(bitmap);
         globalBitmap = bitmap;
         currentBitmap = globalBitmap;
-        desiredWidth = 240;
-        desiredHeight = 320;
+        desiredWidth = 600;
+        desiredHeight = 600;
         gpuImage = new GPUImage(CameraActivity.this);
         intValues = new int[desiredHeight * desiredWidth];
         floatValues = new float[desiredHeight * desiredWidth * 3];
@@ -639,7 +599,9 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                     File tmp = createImageFile();
                     FileOutputStream fos = new FileOutputStream(tmp);
                     if (!isCompressed)
-                        currentBitmap.compress(Bitmap.CompressFormat.JPEG, 60, fos);
+                        currentBitmap.compress(Bitmap.CompressFormat.JPEG, 55, fos);
+                    else
+                        currentBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
                     UploadService uploadService = new UploadService();
                     uploadService.upload(this, tmp);
                     fos.flush();

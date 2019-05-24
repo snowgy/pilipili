@@ -40,7 +40,8 @@ public class ImageService extends GeneralService{
     private List<Image> userImages = new ArrayList<>();
     private List<Image> favoImages = new ArrayList<>();
 
-    String imgBaseURL = "http://10.20.48.113:8080/api/file/";
+    // String imgBaseURL = "http://10.20.48.113:8080/api/file/";
+    String imgBaseURL = "http://10.20.35.198:8080/api/file/";
     CustomAdapter adapter;
     GridView myGridView;
 

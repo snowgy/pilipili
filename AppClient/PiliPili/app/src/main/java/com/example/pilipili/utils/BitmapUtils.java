@@ -28,4 +28,17 @@ public class BitmapUtils {
         }
     }
 
+    public static Bitmap cropBitmapToSquare(Bitmap src) {
+        int width = src.getWidth();
+        int height = src.getHeight();
+        int newWidth = (height > width) ? width : height;
+        int newHeight = (height > width)? height - (height - width) : height;
+        int cropW = (width - height)/2;
+        cropW = (cropW < 0)? 0: cropW;
+        int cropH = (height - width)/2;
+        cropH = (cropH < 0)? 0: cropH;
+        Bitmap cropImg = Bitmap.createBitmap(src, cropW, cropH, newWidth, newHeight);
+        return cropImg;
+    }
+
 }
