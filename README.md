@@ -35,9 +35,9 @@ We release both the [app code](<https://github.com/snowgy/pilipili/tree/master/A
 
 You can download the apk file [here](https://github.com/snowgy/pilipili/blob/master/pilipili.apk)
 
-## Deploy
+## Source code Deploy
 
-If you want to run our server code, follow the following step to start.
+#### Server Start
 
 1. Enter the server directory
 
@@ -62,3 +62,19 @@ $ cd pilipili/Server/pilipili
 
 4. Run `PilipiliApplication`
 
+#### App Start
+
+1. Enter the `pilipili/AppClient/Pilipili`, open `gradle.build` in android studio
+
+2. Modify `com.example.utils.Data`
+
+   ```java
+   public final class Data {
+       public static final String baseUrl = "you server base url";
+       public static final String imgBaseUrl = "your image access url";
+       private Data(){
+       }
+   }
+   ```
+
+3. Install app
