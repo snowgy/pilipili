@@ -1,5 +1,5 @@
 # PiliPili
-
+![apilevel](https://img.shields.io/badge/API%20level-27-brightgreen.svg) ![springboot](https://img.shields.io/badge/springboot-2.0.6-blue.svg)
 
 <div align=center>
   <img width = '150' height ='150' src ="https://ws1.sinaimg.cn/large/74c2bf2dgy1g3dujgreg7j2074074wel.jpg"/>
@@ -15,18 +15,15 @@
 
 `This project is only for learning purpose. Welcome to find crash and give an issue.` 
 
-We release both the [app code](<https://github.com/snowgy/pilipili/tree/master/AppClient/PiliPili>)and [server code](<https://github.com/snowgy/pilipili/tree/master/AppClient/PiliPili>). And our server is using `Springboot` framework.
+We release both the [app code](<https://github.com/snowgy/pilipili/tree/master/AppClient/PiliPili>) and [server code](<https://github.com/snowgy/pilipili/tree/master/AppClient/PiliPili>). And our server is using `Springboot` framework.
 
 ## Result
 
-<div style="float:left;border:solid 1px 000;padding:10px;"><img src="https://ws1.sinaimg.cn/large/74c2bf2dgy1g3dvhl44ihg20dc0rs7wi.gif"  width="300" ></div>
-<div style="float:left;border:solid 1px 000;padding:10px;"><img src="https://ws1.sinaimg.cn/large/74c2bf2dgy1g3dvxoypxej2034102t8n.jpg" width="50"/></div>
-<div style="float:left;border:solid 1px 000;padding:10px;"><img src="https://ws1.sinaimg.cn/large/74c2bf2dgy1g3dvrkldr9g20h40zknjg.gif" width="300"></div>
-
+![](https://ws1.sinaimg.cn/large/74c2bf2dgy1g3dvhl44ihg20dc0rs7wi.gif) ![](https://ws1.sinaimg.cn/large/74c2bf2dgy1g3dvrkldr9g20h40zknjg.gif)
 
 ## Download
 
-You can download the apk file [here]()
+You can download the apk file [here](https://github.com/snowgy/pilipili/blob/master/pilipili.apk)
 
 ## Deploy
 
