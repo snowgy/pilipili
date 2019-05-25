@@ -19,7 +19,11 @@ We release both the [app code](<https://github.com/snowgy/pilipili/tree/master/A
 
 ## Result
 
-![](https://ws1.sinaimg.cn/large/74c2bf2dgy1g3dvhl44ihg20dc0rs7wi.gif) ![](https://ws1.sinaimg.cn/large/74c2bf2dgy1g3dvrkldr9g20h40zknjg.gif)
+<p float="left">
+  <img src="https://ws1.sinaimg.cn/large/74c2bf2dgy1g3dvhl44ihg20dc0rs7wi.gif" width="300" />
+  <img src="https://ws1.sinaimg.cn/large/74c2bf2dgy1g3dvrkldr9g20h40zknjg.gif" width="300" /> 
+</p>
+
 
 ## Download
 
