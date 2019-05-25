@@ -20,6 +20,7 @@ import retrofit2.http.Part;
  * Served as retrofit interface
  */
 public interface Service {
+
     @Multipart
     @POST("/uploadImg")
     Call<ResponseBody> uploadImg(@Part MultipartBody.Part image, @Part("username") RequestBody userName);

@@ -18,7 +18,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/imageView"
-        android:layout_above="@id/bottom_grid_item_bar"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="80dp"
         android:drawableLeft="@mipmap/ic_baseline_favorite_border_black_36"
