@@ -279,6 +279,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
      * add filter to the image
      */
     public void filterImage() {
+        if (globalBitmap == null)
+            return;
         isCompressed = false;
         greyButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -362,6 +364,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
      * @return
      */
     protected Bitmap stylizeImage(Bitmap originBitmap) {
+        if (originBitmap == null)
+            return null;
         isCompressed = true;
         Bitmap bitmap = scaleBitmap(originBitmap, desiredWidth, desiredHeight); // desiredSize
         bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
@@ -578,6 +582,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
                 break;
             case 3:
                 try {
+                    if (currentBitmap == null)
+                        return;
                     File tmp = createImageFile();
                     FileOutputStream fos = new FileOutputStream(tmp);
                     if (isCompressed)
@@ -635,6 +641,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
 
             case 3:
                 try {
+                    if (currentBitmap == null)
+                        return;
                     File tmp = createImageFile();
                     FileOutputStream fos = new FileOutputStream(tmp);
                     if (!isCompressed)
@@ -662,6 +670,8 @@ public class CameraActivity extends AppCompatActivity implements BottomNavigatio
         boolean success = false;
         mImageFile = createImageFile();
         flag++;
+        if (bitmap == null)
+            return false;
         // save image first
         try {
             FileOutputStream fos = new FileOutputStream(mImageFile);
