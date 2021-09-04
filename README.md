@@ -1,9 +1,9 @@
 # PiliPili
 ![apilevel](https://img.shields.io/badge/API%20level-27-brightgreen.svg) ![springboot](https://img.shields.io/badge/springboot-2.0.6-blue.svg)
 
-<div align=center>
+<!-- <div align=center>
   <img width = '150' height ='150' src ="https://ws1.sinaimg.cn/large/74c2bf2dgy1g3dujgreg7j2074074wel.jpg"/>
-</div>
+</div> -->
 
 </br>
 
@@ -17,7 +17,7 @@
 
 We release both the [app code](<https://github.com/snowgy/pilipili/tree/master/AppClient/PiliPili>) and [server code](<https://github.com/snowgy/pilipili/tree/master/AppClient/PiliPili>). And our server is using `Springboot` framework.
 
-## Result
+<!-- ## Result
 
 <p float="left">
   <img src="https://ws1.sinaimg.cn/mw690/74c2bf2dgy1g3dwxh1h4hj20tr1nu1kx.jpg" width="300"/>
@@ -29,7 +29,7 @@ We release both the [app code](<https://github.com/snowgy/pilipili/tree/master/A
   <img src="https://ws1.sinaimg.cn/large/74c2bf2dgy1g3dvrkldr9g20h40zknjg.gif" width="255" /> 
   <img src="https://ws1.sinaimg.cn/large/74c2bf2dgy1g3dwrpjafag20dc0rs4qp.gif" width="255"/>
 </p>
-
+ -->
 
 ## Download
 
